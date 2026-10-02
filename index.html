@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>current - How's your flow?</title>
+    <meta
+      name="description"
+      content="A local board for the working day: what to pick up next, who is waiting on you, and what has quietly gone stale. It ranks your tickets, pull requests, review requests, comments, meetings and service health by whatever needs you first. No dependencies, no build step, no account."
+    />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <!--
+      The version query is not decoration. GitHub Pages serves assets with
+      Cache-Control: max-age=600, so after a publish a returning visitor can
+      keep the previous stylesheet for up to ten minutes while the new HTML is
+      already in front of them. That is how a font change looks like it did not
+      ship. Bump this whenever site.css changes and the new file is fetched at
+      once, because the URL is different.
+    -->
+    <link rel="stylesheet" href="site.css?v=31" />
+
+    <meta property="og:site_name" content="current" />
+    <meta property="og:url" content="https://howsyourflow.io/" />
+    <meta property="og:title" content="current - How&#39;s your flow?" />
+    <meta
+      property="og:description"
+      content="A board for the working day: what to pick up next, who is waiting on you, and what has quietly gone stale. It ranks your tickets, pull requests, reviews, comments, meetings and service health by whatever needs you first."
+    />
+    <meta property="og:type" content="website" />
+    <!-- Absolute, and it has to stay that way: a relative og:image is simply
+         not fetched, which is why link previews came back blank. -->
+    <meta property="og:image" content="https://howsyourflow.io/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="The current wave mark above a calm sea" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="current - How&#39;s your flow?" />
+    <meta name="twitter:description" content="A board for the working day: what to pick up next, who is waiting on you, and what has quietly gone stale. It ranks your tickets, pull requests, reviews, comments, meetings and service health by whatever needs you first." />
+    <meta name="twitter:image" content="https://howsyourflow.io/og.png" />
+
+    <script>
+      /* Applied before first paint so a light-theme visitor never sees a dark
+         flash. Wrapped because a private window can throw on the read itself. */
+      try {
+        var t = localStorage.getItem('current-docs-theme');
+        if (t) document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
+  </head>
+
+  <body>
+    <nav class="nav">
+      <div class="wrap">
+        <a class="nav-brand" href="#top">
+          <img src="logo.png" alt="" />
+          <span>cu<span class="wave-text">r</span><span class="wave-text">r</span>ent</span>
+        </a>
+        <div class="nav-links">
+          <a href="#board">Your Flow</a>
+          <a href="#signals">Signals</a>
+          <a href="#setup">Setup</a>
+          <a href="#start">Quick Start</a>
+          <a href="guide.html">Docs</a>
+        </div>
+        <div class="nav-actions">
+          <button class="theme-toggle" id="theme" type="button" title="Switch theme" aria-label="Switch theme">◐</button>
+        </div>
+      </div>
+    </nav>
+
+    <header class="hero" id="top">
+      <!-- Decorative, so it is hidden from assistive tech and carries no text. -->
+      <canvas class="hero-wave" id="hero-wave" aria-hidden="true"></canvas>
+      <div class="wrap">
+        <img class="mark" src="logo.png" alt="current" />
+        <h1>cu<span class="wave-text">r</span><span class="wave-text">r</span>ent</h1>
+        <p class="tagline">How's your flow?</p>
+        <p class="lede">
+          A board for the working day: what to pick up next, who is waiting on you, and
+          what has quietly gone stale.
+        </p>
+        <p class="sub">
+          It ranks your tickets, pull requests, review requests, comments, meetings and
+          service health by whatever needs you first.
+        </p>
+
+        <p class="provenance">Built at Upwind to help our team ship faster</p>
+
+        <div class="badges">
+          <span class="badge">no dependencies</span>
+          <span class="badge">no build step</span>
+          <span class="badge">no account</span>
+          <span class="badge">no telemetry</span>
+        </div>
+
+        <div class="code">
+          <div class="code-head">
+            <span class="code-dots"><i></i><i></i><i></i></span>
+            <span>terminal</span>
+          </div>
+          <button class="copy" id="copy" type="button">copy</button>
+          <pre id="install"><span class="p">$</span> <span class="c">git clone</span> https://github.com/meduseld-io/current.git
+<span class="p">$</span> <span class="c">cd</span> current
+<span class="p">$</span> <span class="c">npm start</span></pre>
+        </div>
+
+        <div class="cta">
+          <a class="btn primary" href="#start">Get started</a>
+          <a class="btn" href="guide.html">Read the docs</a>
+        </div>
+      </div>
+    </header>
+
+    <section id="board">
+      <div class="wrap">
+        <p class="eyebrow">Your flow</p>
+        <h2>Two kinds of obligation, kept apart</h2>
+        <p class="section-lede">
+          Work only you can finish is a different problem from work where somebody else
+          is stuck until you look.
+        </p>
+        <p class="section-lede">
+          Mixing them into one list makes both easier to ignore,
+          so they get their own columns.
+        </p>
+        <p class="section-lede hint">
+          Hover or tap any chip, label or heading in the example below to see what it is.
+        </p>
+
+        <!--
+          The marks the dashboard itself uses, defined once and referenced by
+          the rows below. GitHub's is from Octicons (MIT, (c) GitHub Inc.), used
+          only to label the GitHub side; the Jira diamond is drawn here.
+        -->
+        <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+          <symbol id="i-github" viewBox="0 0 16 16"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.42 7.42 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></symbol>
+          <symbol id="i-jira" viewBox="0 0 16 16"><path fill="currentColor" d="M8 1.2 14.3 7.5a.7.7 0 0 1 0 1L8 14.8 1.7 8.5a.7.7 0 0 1 0-1L8 1.2Zm0 2.1L3.3 8 8 12.7 12.7 8 8 3.3Zm0 2.6L10.1 8 8 10.1 5.9 8 8 5.9Z"/></symbol>
+        </svg>
+
+        <div class="preview" aria-label="An illustration of the dashboard">
+          <!--
+            Laid out as the real header is: who you are on the left, the counts and
+            the service dots in the middle, what the board is doing on the right.
+          -->
+          <div class="preview-bar">
+            <span class="pbar-left">
+              <img class="pbar-logo" src="logo.png" alt="" width="20" height="12" />
+              <span class="mark" data-tip="The board itself. Everything on it is read live from your own GitHub and Jira accounts.">cu<span class="wave-text">r</span><span class="wave-text">r</span>ent</span>
+              <span class="pbar-who" data-tip="Which accounts the board is reading. Both are yours, and nothing is sent anywhere."><span class="pbar-id">gh</span>: @you · <span class="pbar-id">jira</span>: Your Name</span>
+            </span>
+
+            <span class="pbar-centre">
+              <span class="preview-stats">
+                <span data-tip="Items a rule has found blocked, such as a red check or a requested change. Click a count to dim the page to just those."><b class="n-blocked">2</b> blocked</span>
+                <span data-tip="Approved and green, waiting only for someone to press merge."><b class="n-ready">1</b> ready</span>
+                <span data-tip="Pull requests where someone else is blocked until you review."><b class="n-review">3</b> to review</span>
+              </span>
+              <span class="pbar-dots" data-tip="GitHub, Jira, Slack and Claude. A degraded one makes this board look broken through no fault of its own, so it says so.">
+                <i class="pdot"></i><i class="pdot"></i><i class="pdot"></i><i class="pdot warn"></i>
+              </span>
+            </span>
+
+            <span class="pbar-right">
+              <span class="preview-when" data-tip="When the data was last fetched. It refreshes on load, on Refresh and every five minutes.">updated just now</span>
+              <span class="pbar-search" data-tip="Search by ticket key, pull request number or title.">Search <kbd>/</kbd></span>
+              <span class="pbar-btn" data-tip="Fetch everything again now rather than waiting for the next refresh.">Refresh</span>
+            </span>
+          </div>
+
+          <div class="preview-cols">
+            <div class="preview-col">
+              <h3 class="wave-text" data-tip="Your tickets and pull requests. Work only you can finish."><span class="head-icons"><svg class="i jira" aria-hidden="true"><use href="#i-jira"/></svg><svg class="i" aria-hidden="true"><use href="#i-github"/></svg></span>Your work</h3>
+              <div class="focus" style="--sev: var(--blocked)">
+                <span class="focus-bar"></span>
+                <div class="focus-body">
+                  <div class="focus-top"><svg class="i jira" aria-hidden="true"><use href="#i-jira"/></svg><span class="focus-label" data-tip="A reviewer is blocking, and the detail beside it names who.">Changes requested</span><span class="focus-title" data-tip="The ticket summary or pull request title. On the real board it links straight to it.">Retry transient upload failures</span></div>
+                  <div class="focus-detail">A reviewer is blocking — by @rhiannon</div>
+                  <div class="focus-facts"><span class="focus-repo" data-tip="The repository and pull request number.">● acme/api #128</span><span class="chip key" data-tip="The Jira ticket key, read out of the pull request title or branch name. That link is what powers the out of sync checks.">PROJ-1482</span><span class="chip" data-tip="Discussion on the pull request.">2 comments</span></div>
+                </div>
+                <div class="focus-meta"><span class="focus-diff" data-tip="Lines added and removed, so you can judge the size of a review before opening it."><b class="add">+12</b> <b class="del">−4</b></span><span class="focus-when" data-tip="When this last changed.">2d</span></div>
+              </div>
+              <div class="focus" style="--sev: var(--ready)">
+                <span class="focus-bar"></span>
+                <div class="focus-body">
+                  <div class="focus-top"><svg class="i jira" aria-hidden="true"><use href="#i-jira"/></svg><span class="focus-label" data-tip="Approved with green checks. On the real board this label is also the merge button.">Ready to merge</span><span class="focus-title" data-tip="The ticket summary or pull request title. On the real board it links straight to it.">Paginate the audit log endpoint</span></div>
+                  <div class="focus-detail">Approved, checks green</div>
+                  <div class="focus-facts"><span class="focus-repo" data-tip="The repository and pull request number.">● acme/api #131</span><span class="chip key" data-tip="The Jira ticket key, read out of the pull request title or branch name. That link is what powers the out of sync checks.">PROJ-1455</span></div>
+                </div>
+                <div class="focus-meta"><span class="focus-diff" data-tip="Lines added and removed, so you can judge the size of a review before opening it."><b class="add">+48</b> <b class="del">−9</b></span><span class="focus-when" data-tip="When this last changed.">4h</span></div>
+              </div>
+              <div class="focus" style="--sev: var(--waiting)">
+                <span class="focus-bar"></span>
+                <div class="focus-body">
+                  <div class="focus-top"><svg class="i jira" aria-hidden="true"><use href="#i-jira"/></svg><span class="focus-label" data-tip="Every pull request linked to the ticket is merged, but the ticket is still open.">Ticket needs moving</span><span class="focus-title" data-tip="The ticket summary or pull request title. On the real board it links straight to it.">Drop the legacy region shim</span></div>
+                  <div class="focus-detail">Every linked pull request is merged</div>
+                  <div class="focus-facts"><span class="focus-repo" data-tip="The repository and pull request number.">● acme/infra #77</span><span class="chip key" data-tip="The Jira ticket key, read out of the pull request title or branch name. That link is what powers the out of sync checks.">PROJ-1390</span></div>
+                </div>
+                <div class="focus-meta"><span class="focus-when" data-tip="When this last changed.">1d</span></div>
+              </div>
+              <div class="focus" style="--sev: var(--stale)">
+                <span class="focus-bar"></span>
+                <div class="focus-body">
+                  <div class="focus-top"><svg class="i jira" aria-hidden="true"><use href="#i-jira"/></svg><span class="focus-label" data-tip="The ticket is in flight but nothing has been pushed for five days or more.">In progress, no PR</span><span class="focus-title" data-tip="The ticket summary or pull request title. On the real board it links straight to it.">Backfill the account index</span></div>
+                  <div class="focus-detail">Quiet 6 days with nothing pushed</div>
+                  <div class="focus-facts"><span class="chip key" data-tip="The Jira ticket key, read out of the pull request title or branch name. That link is what powers the out of sync checks.">PROJ-1511</span><span class="chip" data-tip="The Jira issue type.">Sub-task</span></div>
+                </div>
+                <div class="focus-meta"><span class="focus-when" data-tip="When this last changed.">6d</span></div>
+              </div>
+              <div class="focus" style="--sev: var(--parked)">
+                <span class="focus-bar"></span>
+                <div class="focus-body">
+                  <div class="focus-top"><svg class="i jira" aria-hidden="true"><use href="#i-jira"/></svg><span class="focus-label" data-tip="A deliberately parked ticket. These sort to the bottom, below anything you can act on.">On-Hold</span><span class="focus-title" data-tip="The ticket summary or pull request title. On the real board it links straight to it.">Rotate the signing keys</span></div>
+                  <div class="focus-detail">Parked for 9 days — waiting on security</div>
+                  <div class="focus-facts"><span class="chip key" data-tip="The Jira ticket key, read out of the pull request title or branch name. That link is what powers the out of sync checks.">PROJ-1298</span><span class="chip" data-tip="The Jira issue type.">Sub-task</span></div>
+                </div>
+                <div class="focus-meta"><span class="focus-when" data-tip="When this last changed.">9d</span></div>
+              </div>
+            </div>
+
+            <div class="preview-col">
+              <h3 class="wave-text" data-tip="Pull requests where someone else cannot move until you look."><span class="head-icons"><svg class="i" aria-hidden="true"><use href="#i-github"/></svg></span>Waiting on you</h3>
+              <div class="focus" style="--sev: var(--review)">
+                <span class="focus-bar"></span>
+                <div class="focus-body">
+                  <div class="focus-top"><svg class="i " aria-hidden="true"><use href="#i-github"/></svg><span class="focus-label" data-tip="Requested from you by name rather than routed through a team.">Review asked of you</span><span class="focus-title" data-tip="The ticket summary or pull request title. On the real board it links straight to it.">Add a circuit breaker to the fetcher</span></div>
+                  <div class="focus-detail">@marguerite is waiting</div>
+                  <div class="focus-facts"><span class="focus-repo" data-tip="The repository and pull request number.">● acme/api #812</span><span class="chip" data-tip="Discussion on the pull request.">3 comments</span></div>
+                </div>
+                <div class="focus-meta"><span class="focus-diff" data-tip="Lines added and removed, so you can judge the size of a review before opening it."><b class="add">+88</b> <b class="del">−12</b></span><span class="focus-when" data-tip="When this last changed.">3d</span></div>
+              </div>
+              <div class="focus" style="--sev: var(--review)">
+                <span class="focus-bar"></span>
+                <div class="focus-body">
+                  <div class="focus-top"><svg class="i " aria-hidden="true"><use href="#i-github"/></svg><span class="focus-label" data-tip="Requested from you by name rather than routed through a team.">Review asked of you</span><span class="focus-title" data-tip="The ticket summary or pull request title. On the real board it links straight to it.">Split the scheduler config</span></div>
+                  <div class="focus-detail">@tobi is waiting</div>
+                  <div class="focus-facts"><span class="focus-repo" data-tip="The repository and pull request number.">● acme/api #819</span></div>
+                </div>
+                <div class="focus-meta"><span class="focus-diff" data-tip="Lines added and removed, so you can judge the size of a review before opening it."><b class="add">+31</b> <b class="del">−27</b></span><span class="focus-when" data-tip="When this last changed.">1d</span></div>
+              </div>
+              <div class="focus" style="--sev: var(--blocked)">
+                <span class="focus-bar"></span>
+                <div class="focus-body">
+                  <div class="focus-top"><svg class="i " aria-hidden="true"><use href="#i-github"/></svg><span class="focus-label" data-tip="Checks are red on the latest commit.">CI failing</span><span class="focus-title" data-tip="The ticket summary or pull request title. On the real board it links straight to it.">Dark mode for the settings panel</span></div>
+                  <div class="focus-detail">2 checks red on the latest commit</div>
+                  <div class="focus-facts"><span class="focus-repo" data-tip="The repository and pull request number.">● acme/web #204</span><span class="chip" data-tip="Discussion on the pull request.">1 comment</span></div>
+                </div>
+                <div class="focus-meta"><span class="focus-diff" data-tip="Lines added and removed, so you can judge the size of a review before opening it."><b class="add">+140</b> <b class="del">−66</b></span><span class="focus-when" data-tip="When this last changed.">5h</span></div>
+              </div>
+              <div class="focus" style="--sev: var(--stale)">
+                <span class="focus-bar"></span>
+                <div class="focus-body">
+                  <div class="focus-top"><svg class="i " aria-hidden="true"><use href="#i-github"/></svg><span class="focus-label" data-tip="A draft nobody has touched for a week.">Stale draft</span><span class="focus-title" data-tip="The ticket summary or pull request title. On the real board it links straight to it.">Pin the base image digest</span></div>
+                  <div class="focus-detail">Untouched 8 days</div>
+                  <div class="focus-facts"><span class="focus-repo" data-tip="The repository and pull request number.">● acme/infra #91</span><span class="chip draft" data-tip="The pull request is still a draft.">Draft</span></div>
+                </div>
+                <div class="focus-meta"><span class="focus-diff" data-tip="Lines added and removed, so you can judge the size of a review before opening it."><b class="add">+6</b> <b class="del">−2</b></span><span class="focus-when" data-tip="When this last changed.">8d</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="preview-note">An illustration. The rows above are made up, not a screenshot of anyone's work.</p>
+      </div>
+    </section>
+
+    <section id="signals">
+      <div class="wrap">
+        <p class="eyebrow">Signals</p>
+        <h2>It surfaces work with a next action, not everything</h2>
+        <p class="section-lede">
+          A list of every open item is a second backlog. These rules decide what is worth
+          raising; anything that trips none of them stays quiet.
+        </p>
+        <p class="section-lede">
+          An item that trips several
+          appears once, led by its most urgent reason.
+        </p>
+
+        <div class="signals">
+          <div class="signal blocked"><span class="dot"></span><span><b>Changes requested</b><span>A reviewer is blocking, and it names who</span></span></div>
+          <div class="signal blocked"><span class="dot"></span><span><b>CI failing</b><span>Checks are red on the latest commit</span></span></div>
+          <div class="signal blocked"><span class="dot"></span><span><b>Merge conflicts</b><span>Cannot land until rebased</span></span></div>
+          <div class="signal ready"><span class="dot"></span><span><b>Ready to merge</b><span>Approved and green, so the label is the merge button</span></span></div>
+          <div class="signal review"><span class="dot"></span><span><b>Review asked of you</b><span>Requested by name, not via a team</span></span></div>
+          <div class="signal review"><span class="dot"></span><span><b>Waiting on review</b><span>Open 2+ days with no approval</span></span></div>
+          <div class="signal waiting"><span class="dot"></span><span><b>Closed but not shipped</b><span>The ticket is done but its PR is still open</span></span></div>
+          <div class="signal waiting"><span class="dot"></span><span><b>Overdue / due soon</b><span>Due date passed or within three days</span></span></div>
+          <div class="signal waiting"><span class="dot"></span><span><b>Ticket needs moving</b><span>Every linked PR merged, ticket still open</span></span></div>
+          <div class="signal waiting"><span class="dot"></span><span><b>Ticket out of sync</b><span>PR is up for review, ticket still in To Do</span></span></div>
+          <div class="signal"><span class="dot"></span><span><b>In progress, no PR</b><span>Ticket in flight, quiet 5+ days, nothing pushed</span></span></div>
+          <div class="signal"><span class="dot"></span><span><b>Stale draft</b><span>Draft untouched for a week</span></span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="more">
+      <div class="wrap">
+        <p class="eyebrow">Also in the box</p>
+        <h2>All the small things that save a tab</h2>
+
+        <div class="cards">
+          <div class="card">
+            <h3>Tickets and pull requests, linked</h3>
+            <p>
+              Keys such as <code>PROJ-1234</code> are read out of PR titles and branch names
+              and joined to your issues, so a ticket row shows its pull requests and a PR row
+              shows its ticket. That linking is what powers the out-of-sync checks.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Merging, in two clicks</h3>
+            <p>
+              A <em>Ready to merge</em> label is also the merge button. The server re-checks
+              the preconditions against GitHub at the moment of merging rather than trusting
+              the browser, and reads each repository's allowed merge method.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Standup summary</h3>
+            <p>
+              What you finished, what you are on and what is blocking you, since the last
+              working day, folding in your own Jira comments. Copyable as plain text.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Mentions and comments</h3>
+            <p>
+              Unread GitHub notifications that are actually conversation, with review
+              requests filtered out because they already have a column of their own.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Search, pins, flags and notes</h3>
+            <p>
+              Search by ticket key, PR number or title. Pin anything to lift it to the top,
+              or flag it <strong>critical</strong> to lift it above the pins and above every
+              rule. Leave a note on a row, and write <code>#PROJ-1234</code> in it to link
+              straight to that row.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Today's calendar</h3>
+            <p>
+              Today's meetings and your longest free block, read from macOS Calendar or an
+              iCal address, so "when could I actually do this" has an answer.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="setup">
+      <div class="wrap">
+        <p class="eyebrow">Setup</p>
+        <h2>Every source has more than one door</h2>
+        <p class="section-lede">
+          Nothing here assumes a CLI is already installed or that your organisation will
+          hand you an API token. Each source lists its routes in the order the board tries
+          them, and the first one asks the least of you.
+        </p>
+        <p class="section-lede">
+          Settings holds a
+          <strong>Check setup</strong> panel that says which route is actually carrying the
+          board and what to type to fix the rest.
+        </p>
+
+        <div class="cards pairs">
+          <div class="card">
+            <h3>GitHub</h3>
+            <p class="card-note">Pull requests, reviews, notifications.</p>
+            <ol class="routes">
+              <li>
+                <span class="tag best">CLI</span>
+                <code>gh auth login</code>. Nothing to store, nothing in a file.
+              </li>
+              <li>
+                <span class="tag">Token</span>
+                <code>GITHUB_TOKEN</code> in <code>.env</code>, with the <code>repo</code> and
+                <code>notifications</code> scopes. Wins over the CLI, which is how you point
+                at another account.
+              </li>
+            </ol>
+          </div>
+
+          <div class="card">
+            <h3>Jira</h3>
+            <p class="card-note">Tickets, standup summary, ticket and PR linking.</p>
+            <ol class="routes">
+              <li>
+                <span class="tag best">CLI</span>
+                <code>acli jira auth login --web</code>. OAuth in your browser. No token to
+                create and no administrator to ask.
+              </li>
+              <li>
+                <span class="tag">Token</span>
+                <code>JIRA_BASE_URL</code>, <code>JIRA_EMAIL</code> and
+                <code>JIRA_API_TOKEN</code> in <code>.env</code>.
+              </li>
+              <li>
+                <span class="tag">Snapshot</span>
+                <code>data/jira-snapshot.json</code>, written by anything that can reach Jira.
+              </li>
+            </ol>
+          </div>
+
+          <div class="card">
+            <h3>Calendar</h3>
+            <p class="card-note">Today's meetings and your longest free block.</p>
+            <ol class="routes">
+              <li>
+                <span class="tag best">Local</span>
+                <code>node scripts/sync-calendar.mjs</code> reads macOS Calendar. No account
+                involved.
+              </li>
+              <li>
+                <span class="tag">iCal</span>
+                <code>CALENDAR_ICS_URL</code> in <code>.env</code>, a calendar's private
+                address.
+              </li>
+            </ol>
+          </div>
+
+          <div class="card">
+            <h3>Slack</h3>
+            <p class="card-note">Whether you have asked for a review yet.</p>
+            <ol class="routes">
+              <li>
+                <span class="tag">Snapshot</span>
+                <code>data/slack-snapshot.json</code>. Searching your own messages needs a
+                user token, which most workspaces will not issue, so this one is a file by
+                design. See <code>lib/slack.js</code>.
+              </li>
+            </ol>
+          </div>
+        </div>
+
+        <p class="preview-note">
+          Leave all of it unset and the board runs GitHub-only. Sources that are not
+          connected are absent, not empty.
+        </p>
+      </div>
+    </section>
+
+    <section id="start">
+      <div class="wrap">
+        <p class="eyebrow">Quick start</p>
+        <h2>Three commands, then open a tab</h2>
+        <p class="section-lede">
+          You need Node 18 or later. There is nothing to install: the project has no
+          dependencies, so there is no <code>node_modules</code> and no lockfile to audit.
+        </p>
+        <p class="section-lede">
+          The board starts with nothing configured and tells you what is missing.
+        </p>
+
+        <div class="code wide">
+          <div class="code-head">
+            <span class="code-dots"><i></i><i></i><i></i></span>
+            <span>terminal</span>
+          </div>
+          <pre><span class="p">$</span> <span class="c">git clone</span> https://github.com/meduseld-io/current.git
+<span class="p">$</span> <span class="c">cd</span> current
+<span class="p">$</span> <span class="c">npm start</span>
+
+  current → http://localhost:4319
+
+<span class="p">#</span> <span class="m">then sign in to whichever of these you use</span>
+<span class="p">$</span> <span class="c">gh auth login</span>
+<span class="p">$</span> <span class="c">acli jira auth login</span> --web</pre>
+        </div>
+
+        <div class="cards">
+          <div class="card">
+            <h3>Nothing leaves your machine</h3>
+            <p>
+              The server runs locally and talks only to GitHub, Jira and your calendar, as
+              you. Theme, pins, filters and notes live in <code>localStorage</code>; credentials
+              live in <code>.env</code>, which is gitignored.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Nothing to audit</h3>
+            <p>
+              No dependencies, so no transitive supply chain. It is a Node HTTP server and a
+              folder of plain JavaScript, and you can read the whole thing in an afternoon.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">
+        <span>current</span>
+        <span class="right">
+          <a href="guide.html">Docs</a>
+          <!-- A plain mailto rather than a form: the page is static, has no
+               backend, and makes no third-party request, which a hosted form
+               would be the first thing to break. -->
+          <a href="mailto:dylan.martin@upwind.io?subject=current">Contact</a>
+        </span>
+      </div>
+    </footer>
+
+    <script src="wave.js?v=9" defer></script>
+    <script>
+      /* Theme toggle. Every storage call is guarded: a private window, cleared
+         site data or a browser set to block storage throws on access itself,
+         and the page has to render correctly with no stored value. */
+      (function () {
+        var root = document.documentElement;
+        var button = document.getElementById('theme');
+
+        button.addEventListener('click', function () {
+          // No stored choice means light, unconditionally. The page no longer
+          // consults the system, so the toggle must not either.
+          var next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+          root.dataset.theme = next;
+          try {
+            localStorage.setItem('current-docs-theme', next);
+          } catch (e) {}
+        });
+      })();
+
+      /*
+       * Tap to open a tooltip in the example.
+       *
+       * Hover is the whole interaction on a pointer device, and a touch screen
+       * has none, so without this half the visitors have no way to read any of
+       * them. One open at a time, and a tap anywhere else closes it, which is
+       * what a tap outside a popover is expected to do.
+       */
+      /*
+       * Tooltips for the example.
+       *
+       * One element, appended to the body and positioned from the host's own
+       * rectangle. The obvious implementation is an ::after on each host, which
+       * is what this was, but a pseudo-element is a child of its host and this
+       * page has eight ancestors with overflow: hidden, so whole sets of them
+       * were being clipped out of existence without any error to show for it.
+       *
+       * Hover opens them on a pointer, tap on a touch screen, and Escape or a
+       * tap elsewhere closes. They follow nothing while open: a scroll just
+       * dismisses, which is cheaper than tracking and is what a reader expects.
+       */
+      (function () {
+        var preview = document.querySelector('.preview');
+        if (!preview) return;
+
+        var tip = document.createElement('div');
+        tip.className = 'tip';
+        tip.setAttribute('role', 'tooltip');
+        document.body.appendChild(tip);
+
+        var open = null;
+
+        function place(host) {
+          var r = host.getBoundingClientRect();
+          var t = tip.getBoundingClientRect();
+          var gap = 9;
+
+          // Centred on the host, then pulled back inside the viewport. A chip
+          // near either edge would otherwise hang off the side of the page.
+          var left = r.left + r.width / 2 - t.width / 2;
+          left = Math.max(10, Math.min(left, window.innerWidth - t.width - 10));
+
+          // Above by preference, below when there is no room, which is what
+          // the header row needs since it sits at the top of the card.
+          var top = r.top - t.height - gap;
+          if (top < 8) top = r.bottom + gap;
+
+          tip.style.left = Math.round(left) + 'px';
+          tip.style.top = Math.round(top) + 'px';
+        }
+
+        function show(host) {
+          open = host;
+          tip.textContent = host.getAttribute('data-tip');
+          tip.classList.add('on');
+          place(host);
+        }
+
+        function hide() {
+          open = null;
+          tip.classList.remove('on');
+        }
+
+        preview.addEventListener('mouseover', function (event) {
+          var host = event.target.closest('[data-tip]');
+          if (host && host !== open) show(host);
+        });
+
+        preview.addEventListener('mouseout', function (event) {
+          var host = event.target.closest('[data-tip]');
+          if (host && !host.contains(event.relatedTarget)) hide();
+        });
+
+        preview.addEventListener('click', function (event) {
+          var host = event.target.closest('[data-tip]');
+          if (!host) return;
+          // Without this the document handler below would shut it again in the
+          // same tap.
+          event.stopPropagation();
+          host === open ? hide() : show(host);
+        });
+
+        document.addEventListener('click', hide);
+        window.addEventListener('scroll', hide, { passive: true });
+        window.addEventListener('resize', hide);
+        document.addEventListener('keydown', function (event) {
+          if (event.key === 'Escape') hide();
+        });
+      })();
+
+      /* Copy the install commands without the shell prompts, which are decoration. */
+      (function () {
+        var button = document.getElementById('copy');
+        var block = document.getElementById('install');
+        if (!button || !block || !navigator.clipboard) return;
+
+        button.addEventListener('click', function () {
+          var text = block.innerText
+            .split('\n')
+            .map(function (line) {
+              return line.replace(/^\$\s*/, '');
+            })
+            .join('\n')
+            .trim();
+
+          navigator.clipboard.writeText(text).then(function () {
+            button.textContent = 'copied';
+            setTimeout(function () {
+              button.textContent = 'copy';
+            }, 1600);
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>

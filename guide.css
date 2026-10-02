@@ -1,0 +1,253 @@
+/*
+ * Layout for the documentation page.
+ *
+ * site.css is loaded first and supplies the theme tokens, the fonts, the nav
+ * and the footer, so this file only has to describe the two column reading
+ * layout and the things a long document needs that a landing page does not:
+ * a sidebar, headings you can link to, prose tables and copyable commands.
+ */
+
+.docs {
+  display: grid;
+  grid-template-columns: 236px minmax(0, 1fr);
+  gap: 56px;
+  align-items: start;
+  padding: 40px 0 96px;
+}
+
+/* --------------------------------------------------------------- sidebar */
+
+/*
+ * Sticky under the header rather than scrolling away. A table of contents you
+ * have to scroll back up to reach is one nobody uses twice.
+ *
+ * The grid column is what sticks, not the list inside it. `align-items: start`
+ * sizes this column to its own content, and a sticky element can only travel
+ * within its containing block, so sticking the list instead pins it to a box
+ * 689px tall and lets it scroll away with the page.
+ */
+.docs > aside {
+  position: sticky;
+  top: 84px;
+}
+
+.docs-nav {
+  max-height: calc(100vh - 108px);
+  overflow-y: auto;
+  font-size: 13.5px;
+  /* Room for the focus ring on the first and last links. */
+  padding: 2px;
+}
+
+.docs-nav .group {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin: 20px 0 8px;
+}
+.docs-nav .group:first-child { margin-top: 0; }
+
+.docs-nav a {
+  display: block;
+  padding: 5px 10px;
+  margin-left: -10px;
+  border-radius: 7px;
+  color: var(--muted);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+}
+.docs-nav a:hover { color: var(--text); background: var(--surface-2); }
+
+/* Set by the scroll spy, so the sidebar says where you are. */
+.docs-nav a.here {
+  color: var(--text);
+  font-weight: 600;
+  border-left-color: var(--lagoon);
+  background: var(--surface-2);
+}
+
+/* ----------------------------------------------------------------- prose */
+
+.docs-body { min-width: 0; }
+
+.docs-body h2 {
+  font-size: 26px;
+  line-height: 1.25;
+  margin: 52px 0 14px;
+  scroll-margin-top: 90px;
+}
+.docs-body > section:first-child h2 { margin-top: 0; }
+
+.docs-body h3 {
+  font-size: 17px;
+  margin: 30px 0 10px;
+  scroll-margin-top: 90px;
+}
+
+.docs-body p { color: var(--muted); margin: 0 0 14px; max-width: 72ch; }
+.docs-body li { color: var(--muted); margin-bottom: 7px; max-width: 72ch; }
+.docs-body ul, .docs-body ol { padding-left: 20px; margin: 0 0 16px; }
+.docs-body strong { color: var(--text); font-weight: 600; }
+
+/* A heading you can link to. The anchor is only drawn on hover, so it is
+   available without putting a # beside every heading on the page. */
+.docs-body h2, .docs-body h3 { position: relative; }
+.anchor {
+  position: absolute;
+  left: -22px;
+  color: var(--faint);
+  text-decoration: none;
+  opacity: 0;
+  font-weight: 400;
+}
+.docs-body h2:hover .anchor,
+.docs-body h3:hover .anchor,
+.anchor:focus { opacity: 1; }
+
+/* ------------------------------------------------------------------ code */
+
+.docs-body :not(pre) > code {
+  font-family: var(--mono);
+  font-size: 0.88em;
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+  color: var(--text);
+  /* A long variable name should not push the column wider than the prose. */
+  overflow-wrap: break-word;
+}
+
+.cmd {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 0 0 18px;
+  overflow: hidden;
+}
+.cmd pre {
+  margin: 0;
+  padding: 14px 58px 14px 16px;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text);
+}
+.cmd .p { color: var(--faint); user-select: none; }
+.cmd .c { color: var(--wave-2); }
+.cmd .m { color: var(--faint); font-style: italic; }
+
+.cmd .copy {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: pointer;
+}
+.cmd .copy:hover { color: var(--text); border-color: var(--faint); }
+
+/* ---------------------------------------------------------------- tables */
+
+.docs-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 20px;
+  font-size: 13.5px;
+  /* Long values wrap instead of forcing the whole page to scroll sideways. */
+  table-layout: fixed;
+}
+.docs-body th {
+  text-align: left;
+  font-size: 11px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--faint);
+  font-weight: 600;
+  padding: 0 12px 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.docs-body td {
+  padding: 10px 12px 10px 0;
+  border-bottom: 1px solid var(--border-soft);
+  color: var(--muted);
+  vertical-align: top;
+  overflow-wrap: break-word;
+}
+.docs-body td:first-child { color: var(--text); }
+.docs-body td code { white-space: nowrap; }
+
+/* The signal reference, which is colour led, so the dot is the first column. */
+.sig-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--stale);
+  vertical-align: middle;
+}
+.sig-dot.blocked { background: var(--blocked); }
+.sig-dot.ready { background: var(--ready); }
+.sig-dot.review { background: var(--review); }
+.sig-dot.waiting { background: var(--waiting); }
+
+/* ----------------------------------------------------------------- notes */
+
+.note {
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--lagoon);
+  background: var(--surface);
+  border-radius: 0 10px 10px 0;
+  padding: 14px 16px;
+  margin: 0 0 18px;
+  max-width: 72ch;
+}
+.note p { margin: 0; font-size: 14px; }
+.note p + p { margin-top: 8px; }
+.note b { color: var(--text); }
+.note.warn { border-left-color: var(--waiting); }
+
+/* ------------------------------------------------------------ responsive */
+
+/*
+ * Below the two column threshold the sidebar becomes a disclosure above the
+ * text. Collapsed by default: eighteen links ahead of the first paragraph
+ * would push the document itself off a phone screen.
+ */
+@media (max-width: 900px) {
+  .docs { grid-template-columns: minmax(0, 1fr); gap: 0; padding-top: 24px; }
+  .docs > aside { position: static; }
+  .docs-nav {
+    max-height: none;
+    overflow: visible;
+    margin-bottom: 32px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+  }
+  .docs-nav summary {
+    cursor: pointer;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--text);
+    font-size: 14px;
+  }
+  .docs-nav .toc { padding: 0 16px 14px; }
+  .docs-nav .group:first-child { margin-top: 4px; }
+  .docs-body h2 { font-size: 22px; margin-top: 40px; }
+  .anchor { display: none; }
+}
+
+/* The disclosure is a phone affordance; on a wide screen the list is simply
+   the sidebar, so the marker and the summary row are not drawn at all. */
+@media (min-width: 901px) {
+  .docs-nav summary { display: none; }
+}

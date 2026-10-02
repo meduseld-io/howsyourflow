@@ -1,0 +1,1165 @@
+/**
+ * The landing page borrows the application's own palette rather than inventing
+ * a second one, so what someone sees here is what they get when they run it.
+ * The tokens below are a copy of the app's :root block, trimmed to the ones
+ * this page actually uses — a copy because the page is served by GitHub Pages
+ * from docs/ and cannot reach into public/ at build time.
+ */
+
+/*
+ * Figtree, self-hosted.
+ *
+ * The page used to lean on the system stack, which means it looked like a
+ * different typeface on every platform and could only ever approximate the
+ * house sans. Figtree is the closest freely licensed match: the same compact
+ * single-storey g and similar apertures, and within 3% of the same width at
+ * the same size and weight.
+ *
+ * Served from this repository rather than from Google so the page makes no
+ * third-party request at all, loads identically offline, and does not hand
+ * every visitor to a font CDN. One variable file per subset covers 300 to 900,
+ * so every weight on the page costs one request and 20KB.
+ *
+ * font-display: swap renders the fallback immediately and swaps when the file
+ * arrives, so the text is never invisible while the font loads.
+ */
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: url('fonts/figtree-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: url('fonts/figtree-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/*
+ * Light is the default, and it is a plain default rather than a system-derived
+ * one: a first visitor sees light whatever their machine prefers. That is the
+ * opposite of the app itself, which follows the system — but the app is a thing
+ * you live in all day and this is a page someone opens once from a link, where
+ * a predictable first impression beats a personalised one.
+ *
+ * Dark is still here, one click away, and the choice is remembered. It has to
+ * hang off an attribute rather than a media query, because a media query cannot
+ * be overridden by a button.
+ *
+ * The palette is the application's own, so what the page promises is what you
+ * get when you run it. It is a copy because Pages serves docs/ and cannot reach
+ * into public/ at build time.
+ */
+
+:root {
+  color-scheme: light;
+
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --surface-2: #eef1f5;
+  --border: #dde2e9;
+  --border-soft: #e8ecf1;
+  --text: #1a1e25;
+  --muted: #59616f;
+  --faint: #878f9d;
+
+  --blocked: #d1242f;
+  --ready: #1a7f37;
+  --review: #0969da;
+  --todo: #0b8ca0;
+  --inreview: #8250df;
+  --waiting: #9a6700;
+  --stale: #6e7781;
+  --lagoon: #0e9cb0;
+
+  /*
+   * Breaking wave: deep water -> turquoise -> seafoam.
+   *
+   * The seafoam end is deepened well past its dark-theme value because on a
+   * near-white page #35c9a4 holds only 1.93:1 against the background, against
+   * 7.44:1 at the blue end — so the tail of each letter faded out and the
+   * wordmark's second r read as shorter than the first. At #1d9b78 the sweep
+   * runs 3.22:1 to 7.44:1, which is roughly the weight of the turquoise middle
+   * and keeps every part of the glyph present.
+   */
+  --wave-1: #0a47b8;
+  --wave-2: #0f9bad;
+  --wave-3: #1d9b78;
+  --sky: #d6eaf9;
+
+  /* The fallbacks are all sans, and the generic sans-serif last of all, so a
+     failed font load can never drop the page into the browser's serif. */
+  --sans: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+
+  --gutter: 16px;
+  /*
+   * Two widths, because prose and layout want different ones.
+   *
+   * Text has an optimal measure of roughly 60 to 75 characters; past that the
+   * eye loses the start of the next line. Grids and the board preview have no
+   * such limit, and capping everything at the prose width left about 45% of a
+   * 1920px screen empty. So paragraphs keep the narrow measure and everything
+   * else gets the wide one.
+   */
+  --max: 1060px;
+  --max-wide: 1280px;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #0e1014;
+  --surface: #15181e;
+  --surface-2: #1c2029;
+  --border: #252a34;
+  --border-soft: #1e222b;
+  --text: #e8ebf0;
+  --muted: #8d95a5;
+  --faint: #656d7d;
+
+  --blocked: #f2555a;
+  --ready: #3fb950;
+  --review: #58a6ff;
+  --todo: #3ac9d8;
+  --inreview: #a371f7;
+  --waiting: #e3a008;
+  --stale: #7d8590;
+  --lagoon: #2fd2e4;
+
+  --wave-1: #1a5fe0;
+  --wave-2: #21bcd4;
+  --wave-3: #9df2dd;
+  --sky: #0e1014;
+}
+
+* { box-sizing: border-box; }
+
+/* Form controls do not inherit font-family, so they are told explicitly. */
+button, input, select, textarea { font-family: inherit; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+
+.wrap {
+  width: 100%;
+  max-width: var(--max-wide);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+/* The reading column. Anything that is sentences rather than layout keeps the
+   narrower measure, so widening the page costs nothing in readability. */
+.section-lede,
+.hero .lede,
+.hero .sub,
+.preview-note,
+.card p,
+.routes li,
+.signal span {
+  max-width: 68ch;
+}
+.hero .lede,
+.hero .sub,
+.preview-note { margin-left: auto; margin-right: auto; }
+
+/* Ocean wave, as in the app: deep water through turquoise to seafoam. */
+.wave-text {
+  background: linear-gradient(90deg, var(--wave-1) 0%, var(--wave-2) 50%, var(--wave-3) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--wave-2); /* fallback where background-clip is unsupported */
+}
+
+/*
+ * The doubled r needs a full sweep *per letter*. Stretched across both, each
+ * narrow stem gets one flat slice of the range and the pair just reads as a
+ * blue letter beside a green one.
+ *
+ * This used to be done by sizing one gradient to 50% and letting it tile, which
+ * silently assumes the two letters are the same width. They are not — kerning
+ * and the heading's -2px letter-spacing made the first r 22.91px against the
+ * second's 21.76px, so the tile restarted 0.58px *inside* the first r and put a
+ * dark blue sliver on its trailing edge. Giving each letter its own element
+ * gives each its own full-width sweep, which no amount of kerning can push out
+ * of alignment.
+ */
+
+/* ------------------------------------------------------------------- nav */
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-soft);
+}
+.nav .wrap {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  height: 56px;
+}
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  /* A shade larger than the links beside it. It is the name of the thing
+     rather than another destination, and at the same size it read as one. */
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  margin-right: auto;
+}
+.nav-brand img { width: 27px; height: auto; display: block; }
+.nav-links { display: flex; gap: 20px; font-size: 14px; color: var(--muted); }
+.nav-links a:hover { color: var(--text); }
+.nav-actions { display: flex; align-items: center; gap: 10px; }
+
+.theme-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  /* No 300ms wait and no double-tap zoom swallowing the first tap. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.theme-toggle:hover { color: var(--text); border-color: var(--wave-2); }
+
+/*
+ * A 44px hit area around a 32px button.
+ *
+ * 32px is below every touch target guideline, and this one sits 12px from the
+ * top of the viewport where it competes with browser chrome and the pull to
+ * refresh gesture. The button stays the size it looks; only what you can hit
+ * grows, via a pseudo-element so no layout moves.
+ */
+.theme-toggle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+
+/* Without this a missed tap and a broken button look identical. */
+.theme-toggle:active {
+  border-color: var(--wave-2);
+  background: color-mix(in srgb, var(--wave-2) 14%, var(--surface));
+}
+
+@media (max-width: 760px) {
+  .nav-links { display: none; }
+}
+
+/* ----------------------------------------------------------------- hero */
+
+/* The hero holds the canvas, so it has to be a positioning context. */
+.hero {
+  position: relative;
+  padding: 72px 0 48px;
+  text-align: center;
+  overflow: hidden;
+}
+
+/*
+ * The sea behind the wordmark. Pinned to the lower half and faded out towards
+ * the top, so it never comes near the text it sits behind. Masked rather than
+ * just made transparent, because a flat low alpha across the whole box still
+ * puts a grey cast over the headline.
+ */
+.hero-wave {
+  position: absolute;
+  inset: auto 0 0 0;
+  width: 100%;
+  /*
+   * The full hero, so there is sky to put stars in.
+   *
+   * The water does not stretch with it: wave.js measures each layer in pixels
+   * up from the bottom, so the band stays 430px deep however far the lede
+   * wraps. That is what stops the sea climbing behind the paragraph on a
+   * narrow screen, which a canvas sized as a fraction of the hero did.
+   */
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  /*
+   * Fades the light theme's sky in over the top of the water band, measured
+   * from the bottom so it is unaffected by the hero's height. It has to finish
+   * above the first crest, which sits 232px up, or it would eat the top of the
+   * wave; the later it finishes, the further the opaque sky stays from the text.
+   */
+  -webkit-mask-image: linear-gradient(to bottom, transparent calc(100% - 430px), #000 calc(100% - 275px));
+  mask-image: linear-gradient(to bottom, transparent calc(100% - 430px), #000 calc(100% - 275px));
+}
+
+/*
+ * No mask in the dark theme. It exists only to fade the light theme's sky, and
+ * applying it here would erase the stars everywhere except the water, which is
+ * the one place they must never appear.
+ */
+:root[data-theme='dark'] .hero-wave {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+/* Everything else sits above it. */
+.hero .wrap { position: relative; z-index: 1; }
+.hero img.mark { width: 184px; height: auto; display: block; margin: 0 auto 18px; }
+
+.hero h1 {
+  margin: 0 0 14px;
+  font-size: clamp(42px, 9vw, 68px);
+  font-weight: 700;
+  letter-spacing: -2px;
+  line-height: 1;
+}
+
+/* The tagline sits between the wordmark and the explanation: the wordmark says
+   what it is called, this says what it is for, the lede says what it does. */
+.hero .tagline {
+  margin: 0 0 16px;
+  font-size: clamp(18px, 3vw, 23px);
+  font-weight: 600;
+  letter-spacing: -0.4px;
+  line-height: 1.2;
+}
+
+.hero .lede {
+  margin: 0 auto 10px;
+  max-width: 560px;
+  font-size: clamp(17px, 2.6vw, 20px);
+  color: var(--text);
+  line-height: 1.45;
+}
+.hero .sub {
+  margin: 0 auto 26px;
+  max-width: 460px;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+/* Provenance, under the description and above the chips. Quieter than the
+   lede it follows: it is a note about where this came from, not a claim the
+   page is making for itself. */
+.provenance {
+  margin: 0 0 20px;
+  font-size: 13.5px;
+  color: var(--faint);
+  letter-spacing: 0.01em;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+
+/*
+ * Two by two on a phone rather than three across with the fourth stranded on
+ * its own row. The lone chip is centred, but next to a full width row above it
+ * it reads as left over rather than placed. Columns are sized to their content
+ * and the chips keep their natural width inside them.
+ */
+@media (max-width: 460px) {
+  .badges {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    justify-content: center;
+    justify-items: center;
+  }
+}
+.badge {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+}
+
+/* ------------------------------------------------------------ code block */
+
+.code {
+  position: relative;
+  max-width: 460px;
+  margin: 0 auto;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+/* The hero's terminal is a centred 460px block, which suits a block of text
+   sitting on its own. In Quick Start it sits directly above a pair of cards,
+   and a narrower box above two wider ones reads as a mistake rather than as a
+   choice, so there it takes the full column width. */
+.code.wide {
+  max-width: none;
+  margin: 0 0 18px;
+}
+
+.code-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 11.5px;
+  color: var(--faint);
+  font-family: var(--mono);
+}
+.code-dots { display: flex; gap: 5px; margin-right: 2px; }
+.code-dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--border); display: block; }
+.code pre {
+  margin: 0;
+  padding: 14px 16px;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.75;
+  overflow-x: auto;
+}
+.code .p { color: var(--faint); user-select: none; }
+.code .c { color: var(--wave-2); }
+.code .m { color: var(--faint); font-style: italic; }
+.copy {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--muted);
+  border-radius: 6px;
+  font-size: 11px;
+  font-family: var(--mono);
+  padding: 3px 8px;
+  cursor: pointer;
+}
+.copy:hover { color: var(--text); border-color: var(--wave-2); }
+
+.cta { display: flex; gap: 10px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+.btn:hover { border-color: var(--wave-2); }
+.btn.primary {
+  background: linear-gradient(95deg, var(--wave-1), var(--wave-2));
+  /*
+   * Size the gradient to the box it is painted into.
+   *
+   * background-origin defaults to padding-box while background-clip defaults
+   * to border-box, so with the transparent 1px border inherited from .btn the
+   * gradient was laid out 2px smaller than the area it fills and tiled to
+   * cover the rest, restarting in a visible seam down the right edge.
+   */
+  background-origin: border-box;
+  border-color: transparent;
+  color: #fff;
+}
+.btn.primary:hover { filter: brightness(1.08); }
+
+/* ------------------------------------------------------------- sections */
+
+/* Every section gets the divider, including the first. The hero above it is a
+   <header> rather than a <section>, so the old :first-of-type exception was
+   aimed at a section that does not exist and only ever stripped the rule from
+   Your Flow, leaving it floating under the hero. */
+/* --border rather than --border-soft: the soft one sits at 1.10:1 against the
+   page, which is close enough to invisible that the sections ran together. */
+section { padding: 56px 0; border-top: 1px solid var(--border); }
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin: 0 0 8px;
+}
+h2 {
+  margin: 0 0 10px;
+  font-size: clamp(25px, 4.5vw, 32px);
+  font-weight: 650;
+  letter-spacing: -0.8px;
+  line-height: 1.2;
+}
+.section-lede {
+  margin: 0 0 30px;
+  max-width: 620px;
+  color: var(--muted);
+  font-size: 15.5px;
+}
+
+/* --------------------------------------------------------- board preview */
+
+/* A mock-up, not a screenshot: a screenshot of the real board would be a
+   screenshot of somebody's actual tickets. The rows below are invented, and
+   the markup mirrors the app's so the shapes and colours are honest. */
+.preview {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  /* Not hidden: the tooltips below have to escape this box. The header bar
+     clips itself to the top corners instead, which is all the hidden was
+     buying. */
+  box-shadow: 0 18px 50px -28px rgba(16, 24, 40, 0.28);
+}
+.preview-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  height: 46px;
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--surface-2);
+  border-radius: 13px 13px 0 0; /* 14 less the 1px border */
+  font-size: 13px;
+}
+/* Three groups, as the real header has: identity, counts, state. */
+/*
+ * Three groups, with the outer two sharing the leftover space equally so the
+ * middle one lands centred. Auto margins would also centre it, but they consume
+ * the free space first and then squeeze the outer groups below their own
+ * content width, which spilled out of the card now that it has to stay
+ * overflow-visible for the tooltips.
+ */
+.pbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+}
+.pbar-logo { width: 20px; height: auto; image-rendering: pixelated; flex: 0 0 auto; }
+.preview-bar .mark { font-weight: 600; letter-spacing: -0.3px; flex: 0 0 auto; }
+.pbar-who {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The counts sit over the service dots, centred, exactly as they do in the app. */
+/* The board colours these two labels rather than underlining them, so the
+   accounts read as links without decoration. */
+.pbar-id { color: var(--lagoon); }
+
+.pbar-centre {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex: 0 0 auto;
+}
+.preview-stats {
+  display: flex;
+  gap: 14px;
+  color: var(--muted);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.preview-stats b { font-weight: 700; font-size: 12px; }
+.n-blocked { color: var(--blocked); }
+.n-ready { color: var(--ready); }
+.n-review { color: var(--review); }
+
+.pbar-dots { display: flex; gap: 5px; }
+.pdot { width: 6px; height: 6px; border-radius: 50%; background: var(--ready); }
+.pdot.warn { background: var(--degraded, #d9480f); }
+
+.pbar-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+}
+.preview-when { color: var(--faint); font-size: 11.5px; font-family: var(--mono); white-space: nowrap; }
+
+/* Shapes rather than controls: it is an illustration, so nothing here is live. */
+.pbar-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--faint);
+  font-size: 11.5px;
+}
+.pbar-search kbd {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  padding: 0 4px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.pbar-btn {
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+/* A 375px header cannot hold all of it, and the real one drops the same parts. */
+@media (max-width: 860px) {
+  .pbar-who, .pbar-search { display: none; }
+}
+@media (max-width: 620px) {
+  .preview-stats { gap: 9px; }
+  .pbar-btn { display: none; }
+}
+
+.preview-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.preview-col { padding: 16px 14px 18px; min-width: 0; }
+.preview-col + .preview-col { border-left: 1px solid var(--border-soft); }
+.preview-col h3 {
+  margin: 0 0 12px;
+  font-size: 12px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* The tool each row came from, as the real board shows it. */
+.i {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  color: var(--faint);
+}
+.i.jira { color: var(--review); }
+
+.preview-col h3 { display: flex; align-items: center; gap: 7px; }
+.head-icons { display: inline-flex; align-items: center; gap: 4px; }
+.head-icons .i { width: 13px; height: 13px; }
+
+/*
+ * The cards, matching the board itself: a coloured edge for urgency, the reason
+ * in caps before the title, the detail under it and the facts under that. The
+ * earlier version was a list of hairline rows, which carried the same words in
+ * a shape nobody would have recognised.
+ */
+.focus {
+  display: grid;
+  grid-template-columns: 3px 1fr auto;
+  gap: 0 12px;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.focus:last-child { margin-bottom: 0; }
+
+.focus-bar { align-self: stretch; background: var(--sev); }
+.focus-body { padding: 8px 0; min-width: 0; }
+
+.focus-top { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.focus-top .i { align-self: center; }
+
+.focus-label {
+  flex: 0 0 auto;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  color: var(--sev);
+}
+
+.focus-title {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  color: var(--text);
+}
+
+.focus-detail {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.focus-facts {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 5px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--faint);
+  white-space: nowrap;
+}
+.focus-repo { flex: 0 0 auto; }
+
+.focus-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-right: 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--faint);
+  white-space: nowrap;
+}
+.focus-diff .add { color: var(--ready); font-weight: 400; }
+.focus-diff .del { color: var(--blocked); font-weight: 400; }
+
+@media (max-width: 720px) {
+  /* The diff is the first thing worth losing when the card has to narrow. */
+  .focus-diff { display: none; }
+}
+
+.prow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.prow:last-child { border-bottom: none; }
+.prow-main { min-width: 0; flex: 1; }
+.prow-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13.5px;
+  margin-bottom: 4px;
+}
+.prow-title .text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.prow-sub {
+  font-size: 11.5px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.prow-right { flex: 0 0 auto; display: flex; align-items: center; }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+  line-height: 16px;
+  flex: 0 0 auto;
+}
+.chip.key { color: var(--review); }
+
+.status {
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 1px 8px;
+  border-radius: 10px;
+  border: 1px solid;
+  white-space: nowrap;
+}
+.status.todo { color: var(--todo); border-color: color-mix(in srgb, var(--todo) 40%, transparent); background: color-mix(in srgb, var(--todo) 12%, transparent); }
+.status.progress { color: var(--review); border-color: color-mix(in srgb, var(--review) 40%, transparent); background: color-mix(in srgb, var(--review) 12%, transparent); }
+.status.inreview { color: var(--inreview); border-color: color-mix(in srgb, var(--inreview) 40%, transparent); background: color-mix(in srgb, var(--inreview) 12%, transparent); }
+.status.parked { color: var(--waiting); border-color: color-mix(in srgb, var(--waiting) 40%, transparent); background: color-mix(in srgb, var(--waiting) 12%, transparent); font-style: italic; }
+.status.done { color: var(--ready); border-color: color-mix(in srgb, var(--ready) 40%, transparent); background: color-mix(in srgb, var(--ready) 12%, transparent); }
+
+.why { font-weight: 500; }
+.why.blocked { color: var(--blocked); }
+.why.ready { color: var(--ready); }
+.why.waiting { color: var(--waiting); }
+.why.review { color: var(--review); }
+.why.stale { color: var(--stale); }
+
+/* ------------------------------------------------------- example tooltips */
+
+/*
+ * One tooltip element in the body, positioned by script, rather than an ::after
+ * on each host.
+ *
+ * ::after was simpler and wrong. A pseudo-element is a child of its host, so
+ * any ancestor with overflow: hidden erases it, and this page has eight of
+ * those for entirely good reasons: ellipsis on long titles, rounded corners on
+ * the card, keeping the header groups from spilling. Every time one was added
+ * a set of tooltips went silently dark. Positioned from the body nothing can
+ * clip it, and the hosts are free to clip whatever they like.
+ */
+.tip {
+  position: fixed;
+  z-index: 90;
+  top: 0;
+  left: 0;
+
+  max-width: 250px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: 0 10px 26px -12px rgba(16, 24, 40, 0.4);
+
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1.45;
+  text-align: left;
+  color: var(--text);
+  /* The headings are .wave-text, which paints its text transparent for the
+     gradient. Inheriting that is what made the first version render an empty
+     white box over the section titles. */
+  -webkit-text-fill-color: var(--text);
+
+  opacity: 0;
+  transform: translateY(3px);
+  pointer-events: none;
+  transition: opacity 0.14s, transform 0.14s;
+}
+.tip.on {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.preview [data-tip] { cursor: help; }
+
+@media (hover: hover) and (pointer: fine) {
+  /* A dotted underline is the only standing hint that there is something to
+     hover. Anything stronger would compete with the colours the example is
+     meant to be demonstrating. */
+  .preview [data-tip] { position: relative; }
+  .preview [data-tip]::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    border-bottom: 1px dotted var(--faint);
+    opacity: 0;
+    transition: opacity 0.12s;
+  }
+  .preview [data-tip]:hover::before { opacity: 0.5; }
+}
+
+@media (max-width: 720px) {
+  .preview [data-tip] { cursor: pointer; }
+}
+
+/* The line that tells you the tooltips are there. */
+/* A lede split across two paragraphs is one thought with a pause in it, not two
+   blocks of copy, so the gap between them is a line rather than a full
+   paragraph space. Same trick the hint below uses. */
+.section-lede + .section-lede { margin-top: -18px; }
+
+/* Matched to the note on the other side of the example: the two are a pair of
+   captions about the same thing, so they are the same size and both centred. */
+.section-lede.hint {
+  margin: -18px auto 14px;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--faint);
+}
+
+.preview-note {
+  /* auto, not 0: the narrow reading measure set earlier centres this, and a
+     margin shorthand further down the file was quietly resetting it. */
+  margin: 12px auto 0;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--faint);
+}
+
+@media (max-width: 720px) {
+  .preview-cols { grid-template-columns: minmax(0, 1fr); }
+  .preview-col + .preview-col { border-left: none; border-top: 1px solid var(--border-soft); }
+  .preview-stats { display: none; }
+}
+
+/* ---------------------------------------------------------------- cards */
+
+/*
+ * Explicit column counts rather than auto-fit, so a short last row can be told
+ * to fill the width instead of leaving dead space.
+ *
+ * auto-fit is tidier to write, but it picks the column count at layout time and
+ * CSS cannot ask what it chose — and "how many are on the last row" is purely a
+ * function of that count against the number of children. With a fixed count per
+ * breakpoint, :nth-child can work it out.
+ *
+ * Above 840px the grid is six tracks rather than three, so a row can be divided
+ * into halves as well as thirds: a card normally spans two, a lone last card
+ * spans all six, and a trailing pair takes three each. Three columns' worth of
+ * layout, with a half-step available when the arithmetic needs one.
+ *
+ * The breakpoints reproduce what auto-fit was already doing, so nothing moves
+ * at any width: three columns need 3 x 260 + 2 x 14 = 808px of content, which
+ * is an 840px viewport once the 16px gutters come off; two need 534px, so 566.
+ *
+ * Each range is closed at both ends rather than relying on later rules to undo
+ * earlier ones — the orphan selectors are more specific than the base rule, so
+ * an open-ended range would need its overrides unpicked in a particular order,
+ * which is the kind of thing that breaks the next time a rule is added.
+ */
+.cards {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 566px) and (max-width: 839.98px) {
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  /* In two columns the only short row is a single trailing card. */
+  .cards > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
+
+@media (min-width: 840px) {
+  .cards { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .cards > * { grid-column: span 2; }
+
+  /* One left over: it takes the whole row. Also covers a single-card section. */
+  .cards > :last-child:nth-child(3n + 1) { grid-column: span 6; }
+
+  /* Two left over: half each. The pair is the last child at 3n + 2 and the one
+     before it, which is necessarily at 3n + 1. */
+  .cards > :last-child:nth-child(3n + 2),
+  .cards > :nth-last-child(2):nth-child(3n + 1) { grid-column: span 3; }
+
+  /*
+   * A grid that wants pairs rather than thirds. Four cards read better as two
+   * rows of two than as a row of three above a single card stretched across
+   * the width, which is what the orphan rule would otherwise make of them.
+   *
+   * The resets are listed explicitly because the orphan selectors above carry
+   * three pseudo-classes each and would otherwise outrank a plain .pairs > *.
+   */
+  .cards.pairs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cards.pairs > *,
+  .cards.pairs > :last-child:nth-child(3n + 1),
+  .cards.pairs > :last-child:nth-child(3n + 2),
+  .cards.pairs > :nth-last-child(2):nth-child(3n + 1) { grid-column: auto; }
+
+  /* An odd number still leaves one alone, and it still fills the row. */
+  .cards.pairs > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+}
+.card h3 { margin: 0 0 6px; font-size: 16px; font-weight: 600; letter-spacing: -0.2px; }
+.card p { margin: 0; color: var(--muted); font-size: 14px; }
+.card code {
+  font-family: var(--mono);
+  font-size: 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+  border-radius: 5px;
+  padding: 1px 5px;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- routes */
+
+/* Each source lists its routes in the order the board tries them. Numbered,
+   because the order is the point: the first one asks the least of the reader. */
+.card-note { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
+
+.routes {
+  margin: 0;
+  padding: 0 0 0 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  counter-reset: route;
+}
+.routes li {
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+.routes li::marker { color: var(--faint); font-variant-numeric: tabular-nums; }
+
+.tag {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--faint);
+  margin-right: 6px;
+  vertical-align: 1px;
+}
+/* The route that needs no secret. Marked rather than described, so the reader
+   can see which door to try without reading all of them. */
+.tag.best {
+  color: var(--wave-2);
+  border-color: color-mix(in srgb, var(--wave-2) 45%, transparent);
+  background: color-mix(in srgb, var(--wave-2) 12%, transparent);
+}
+
+/* --------------------------------------------------------------- signals */
+
+/* The same arrangement with this grid's own numbers: a 300px minimum and a 1px
+   gap put three columns at 934px and two at 634px. Twelve signals divide evenly
+   into both, so nothing is short today — this is here so that a thirteenth does
+   not quietly strand one. */
+.signals {
+  display: grid;
+  gap: 1px;
+  grid-template-columns: minmax(0, 1fr);
+  background: var(--border-soft);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+@media (min-width: 634px) and (max-width: 933.98px) {
+  .signals { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .signals > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
+
+@media (min-width: 934px) {
+  .signals { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .signals > * { grid-column: span 2; }
+  .signals > :last-child:nth-child(3n + 1) { grid-column: span 6; }
+  .signals > :last-child:nth-child(3n + 2),
+  .signals > :nth-last-child(2):nth-child(3n + 1) { grid-column: span 3; }
+}
+
+.signal {
+  display: flex;
+  gap: 11px;
+  align-items: baseline;
+  background: var(--surface);
+  padding: 13px 16px;
+}
+.signal .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: var(--stale);
+  transform: translateY(-1px);
+}
+.signal.blocked .dot { background: var(--blocked); }
+.signal.ready .dot { background: var(--ready); }
+.signal.waiting .dot { background: var(--waiting); }
+.signal.review .dot { background: var(--review); }
+.signal b { font-weight: 600; font-size: 14px; display: block; }
+.signal span { color: var(--muted); font-size: 13.5px; }
+
+/* --------------------------------------------------------------- footer */
+
+footer {
+  border-top: 1px solid var(--border-soft);
+  padding: 34px 0 48px;
+  color: var(--faint);
+  font-size: 13.5px;
+}
+footer .wrap { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+footer a { color: var(--muted); }
+footer a:hover { color: var(--text); }
+footer .right { margin-left: auto; display: flex; gap: 16px; }
+
+/*
+ * Stacked and centred on a phone. The auto margin that pushes the links right
+ * on a wide screen just leaves them hard against the left edge once the row
+ * wraps, under a left aligned licence line, which reads as a mistake rather
+ * than a layout.
+ */
+@media (max-width: 560px) {
+  footer .wrap {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+  footer .right {
+    margin-left: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 18px;
+  }
+}
