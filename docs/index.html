@@ -1,0 +1,922 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Documentation - current</title>
+    <meta
+      name="description"
+      content="How to install, connect and run current: the GitHub and Jira routes, the calendar and Slack sources, every signal the board raises, the full configuration reference and what stays on your machine."
+    />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+
+    <script>
+      /* Applied before first paint so a light-theme visitor never sees a dark
+         flash. Wrapped because a private window can throw on the read itself. */
+      try {
+        var t = localStorage.getItem('current-docs-theme');
+        if (t) document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
+
+    <link rel="stylesheet" href="/site.css?v=31" />
+    <link rel="stylesheet" href="/guide.css?v=1" />
+
+    <meta property="og:site_name" content="current" />
+    <meta property="og:url" content="https://howsyourflow.io/docs/" />
+    <meta property="og:title" content="Documentation - current" />
+    <meta
+      property="og:description"
+      content="Install it, connect GitHub and Jira, and read what every signal on the board means."
+    />
+    <meta property="og:type" content="article" />
+    <!-- Absolute, and it has to stay that way: a relative og:image is simply
+         not fetched, which is why link previews came back blank. -->
+    <meta property="og:image" content="https://howsyourflow.io/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="The current wave mark above a calm sea" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Documentation - current" />
+    <meta name="twitter:description" content="Install it, connect GitHub and Jira, and read what every signal on the board means." />
+    <meta name="twitter:image" content="https://howsyourflow.io/og.png" />
+  </head>
+
+  <body>
+    <nav class="nav">
+      <div class="wrap">
+        <a class="nav-brand" href="/">
+          <img src="/logo.png" alt="" />
+          <span>cu<span class="wave-text">r</span><span class="wave-text">r</span>ent</span>
+        </a>
+        <div class="nav-links">
+          <a href="/#board">Your Flow</a>
+          <a href="/#signals">Signals</a>
+          <a href="/#setup">Setup</a>
+          <a href="/docs/">Docs</a>
+        </div>
+        <div class="nav-actions">
+          <button class="theme-toggle" id="theme" type="button" title="Switch theme" aria-label="Switch theme">◐</button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="wrap">
+      <div class="docs">
+        <!-- A disclosure on a phone, the sidebar on anything wider. -->
+        <aside>
+          <details class="docs-nav" id="toc">
+            <summary>On this page</summary>
+            <div class="toc">
+              <p class="group">Getting started</p>
+              <a href="#overview">Overview</a>
+              <a href="#quick-start">Quick start</a>
+              <a href="#github">Connecting GitHub</a>
+              <a href="#jira">Connecting Jira</a>
+              <a href="#calendar">Calendar</a>
+              <a href="#slack">Slack</a>
+
+              <p class="group">Using the board</p>
+              <a href="#board">What the board shows</a>
+              <a href="#signals">Signal reference</a>
+              <a href="#linking">Linking tickets and PRs</a>
+              <a href="#statuses">Jira statuses</a>
+              <a href="#filters">Filters and per-viewer state</a>
+              <a href="#merging">Merging</a>
+              <a href="#notifications">Desktop notifications</a>
+              <a href="#extras">Search, the tour and the game</a>
+              <a href="#status-dots">Service status dots</a>
+
+              <p class="group">Reference</p>
+              <a href="#config">Configuration</a>
+              <a href="#privacy">What leaves your machine</a>
+              <a href="#troubleshooting">Troubleshooting</a>
+              <a href="#architecture">How it is built</a>
+              <a href="#licence">Licence</a>
+            </div>
+          </details>
+        </aside>
+
+        <div class="docs-body">
+          <section id="overview">
+            <p class="eyebrow">Documentation</p>
+            <h2><a class="anchor" href="#overview" aria-hidden="true">#</a>Overview</h2>
+            <p>
+              <strong>current</strong> is a board for the working day. It reads your Jira
+              tickets and your GitHub pull requests, works out which of them have a next
+              action, and puts those in front of you in the order they need you.
+            </p>
+            <p>
+              It runs on your own machine, reads your own accounts and sends nothing
+              anywhere. There are no dependencies, no build step and no account to create.
+            </p>
+            <p>
+              It is deliberately not a list of everything you own. A list of every open
+              item is a second backlog, so anything that trips none of the
+              <a href="#signals">signal rules</a> stays quiet.
+            </p>
+          </section>
+
+          <section id="quick-start">
+            <h2><a class="anchor" href="#quick-start" aria-hidden="true">#</a>Quick start</h2>
+            <p>You need <strong>Node 18 or later</strong>. Nothing else is installed.</p>
+            <div class="cmd">
+              <button class="copy" type="button">copy</button>
+              <pre><span class="p">$</span> <span class="c">git clone</span> https://github.com/meduseld-io/current.git
+<span class="p">$</span> <span class="c">cd</span> current
+<span class="p">$</span> <span class="c">npm start</span></pre>
+            </div>
+            <p>Then open <a href="http://localhost:4319">http://localhost:4319</a>.</p>
+            <p>
+              The board starts with nothing configured and tells you what is missing.
+              Settings holds a <strong>Check setup</strong> panel that names each source,
+              says whether it is working, and gives you the exact command to fix it. It
+              opens by itself only when something is genuinely broken.
+            </p>
+            <div class="note">
+              <p>
+                <b>You can stop here.</b> With GitHub connected and Jira left alone, the
+                board runs GitHub-only. Every source below is optional.
+              </p>
+            </div>
+          </section>
+
+          <section id="github">
+            <h2><a class="anchor" href="#github" aria-hidden="true">#</a>Connecting GitHub</h2>
+            <p>Either route works, and you only need one.</p>
+
+            <h3><a class="anchor" href="#github" aria-hidden="true">#</a>The gh CLI</h3>
+            <div class="cmd">
+              <button class="copy" type="button">copy</button>
+              <pre><span class="p">$</span> <span class="c">gh auth login</span></pre>
+            </div>
+            <p>
+              That is it. The board reads the token from the
+              <a href="https://cli.github.com">gh CLI</a>, so if <code>gh auth status</code>
+              works, so does this. No secret is stored anywhere.
+            </p>
+
+            <h3><a class="anchor" href="#github" aria-hidden="true">#</a>A personal access token</h3>
+            <p>
+              If <code>gh</code> is not installed or not an option on your machine, put a
+              <a href="https://github.com/settings/tokens">personal access token</a> with
+              the <code>repo</code> and <code>notifications</code> scopes in
+              <code>.env</code> instead.
+            </p>
+            <div class="cmd">
+              <button class="copy" type="button">copy</button>
+              <pre><span class="p">$</span> <span class="c">cp</span> .env.example .env
+<span class="p">$</span> <span class="c">echo</span> "GITHUB_TOKEN=ghp_..." &gt;&gt; .env</pre>
+            </div>
+            <p>
+              <code>GITHUB_TOKEN</code> wins over the CLI, which is also how you point the
+              board at a different account from the one <code>gh</code> is signed in to.
+            </p>
+          </section>
+
+          <section id="jira">
+            <h2><a class="anchor" href="#jira" aria-hidden="true">#</a>Connecting Jira</h2>
+            <p>
+              Three routes, tried in that order. The first asks the least of you. All three
+              produce the same board through the same shaping code, so nothing on screen
+              depends on which door opened.
+            </p>
+
+            <h3><a class="anchor" href="#jira" aria-hidden="true">#</a>1. The Atlassian CLI</h3>
+            <div class="cmd">
+              <button class="copy" type="button">copy</button>
+              <pre><span class="p">$</span> <span class="c">brew install</span> atlassian/acli/acli
+<span class="p">$</span> <span class="c">acli jira auth login</span> --web</pre>
+            </div>
+            <p>
+              <a href="https://developer.atlassian.com/cloud/acli/">Atlassian's CLI</a>
+              signs in through your browser with OAuth. There is no token to create,
+              nothing to paste into a file, and no administrator to ask, which is the step
+              that stops people in organisations where self-service token creation is
+              switched off.
+            </p>
+
+            <h3><a class="anchor" href="#jira" aria-hidden="true">#</a>2. An API token</h3>
+            <p>
+              Set <code>JIRA_BASE_URL</code>, <code>JIRA_EMAIL</code> and
+              <a href="https://id.atlassian.com/manage-profile/security/api-tokens"><code>JIRA_API_TOKEN</code></a>
+              in <code>.env</code>. All three or none.
+            </p>
+            <p>
+              Use this route when <code>acli</code> is not available to you, or when the
+              credential has to belong to a different account from the one you are signed
+              in as. In that case also set <code>JIRA_ASSIGNEE</code> to your own address.
+            </p>
+            <div class="note warn">
+              <p>
+                <b>Scoped tokens</b> must go through Atlassian's gateway rather than your
+                site URL, so they also need <code>JIRA_CLOUD_ID</code>. An unscoped token
+                does not.
+              </p>
+            </div>
+            <div class="note">
+              <p>
+                <b>A shared or admin token reports zero tickets.</b> Jira's
+                <code>currentUser()</code> is whoever owns the token, so an administrative
+                account authenticates perfectly and then owns none of your work, which
+                looks exactly like an empty board. Set <code>JIRA_ASSIGNEE</code> to the
+                email or account id the board is actually about and the header will name
+                that person rather than whoever holds the credentials.
+              </p>
+            </div>
+
+            <h3><a class="anchor" href="#jira" aria-hidden="true">#</a>3. A snapshot file</h3>
+            <p>
+              Where even the CLI is restricted, the board reads
+              <code>data/jira-snapshot.json</code>, so it can be fed by any process that
+              <em>can</em> reach Jira: a script, a scheduled job or an assistant with a Jira
+              integration. The file's shape is documented in <code>lib/jira.js</code>.
+            </p>
+            <p>Leave all of it unset to run GitHub-only.</p>
+          </section>
+
+          <section id="calendar">
+            <h2><a class="anchor" href="#calendar" aria-hidden="true">#</a>Calendar</h2>
+            <p>
+              With a calendar configured, a strip above the board says how much of the day
+              is already spoken for and how long the largest uninterrupted block is, which
+              is the number that actually changes a decision. Three hours clear means
+              picking up a review; forty minutes between two meetings does not.
+            </p>
+
+            <h3><a class="anchor" href="#calendar" aria-hidden="true">#</a>From macOS Calendar</h3>
+            <div class="cmd">
+              <button class="copy" type="button">copy</button>
+              <pre><span class="p">$</span> <span class="c">node</span> scripts/sync-calendar.mjs</pre>
+            </div>
+            <p>
+              This asks Calendar.app for today's meetings and writes the snapshot. It needs
+              no OAuth client, no app registration and no administrator, only the one-time
+              automation prompt macOS shows on first run. It deduplicates, so a meeting held
+              in both a work calendar and a subscribed copy appears once.
+            </p>
+            <p>
+              You should not have to run it. A snapshot only describes the day it was taken,
+              and a step you must remember every morning is a step that does not happen, so
+              a stale snapshot is refreshed in the background at most every half hour.
+              <code>CALENDAR_AUTOSYNC=off</code> turns that off.
+            </p>
+
+            <h3><a class="anchor" href="#calendar" aria-hidden="true">#</a>From an iCal address</h3>
+            <p>
+              Set <code>CALENDAR_ICS_URL</code> to a calendar's private iCal address. In
+              Google Calendar that is Settings &rsaquo; your calendar &rsaquo; "Secret
+              address in iCal format".
+            </p>
+            <div class="note warn">
+              <p>
+                <b>Treat the secret address as a password.</b> It grants read access to that
+                calendar. A Workspace administrator can remove it, leaving only a
+                <em>public</em> address that would publish your calendar to anyone holding
+                the URL. Never use the public one. Where the secret address is gone, the
+                macOS route above is the way in.
+              </p>
+            </div>
+            <p>
+              Failing both, <code>data/calendar-snapshot.json</code> is read instead, holding
+              either raw events or an already-summarised day;
+              <code>lib/calendar.js</code> documents both shapes. With none of the three, the
+              strip simply does not appear.
+            </p>
+            <p>
+              Only daily and weekly recurrence is expanded. Standups, one-to-ones and team
+              meetings are almost all one or the other, and a full RRULE implementation buys
+              very little for a working day. Meetings you declined, and meetings where
+              everyone else declined, are left out.
+            </p>
+          </section>
+
+          <section id="slack">
+            <h2><a class="anchor" href="#slack" aria-hidden="true">#</a>Slack</h2>
+            <p>
+              If you ask for reviews in Slack, a pull request row can show
+              <strong>asked 2 days ago</strong>, linking to the message. The useful half is
+              the absence: a pull request waiting on review with no such chip is one nobody
+              has actually been asked to look at.
+            </p>
+            <p>
+              There is no live Slack path. Finding your own messages needs
+              <code>search.messages</code>, which Slack accepts only from a user token, and
+              user tokens require a Slack app your workspace may not let you create. So this
+              reads <code>data/slack-snapshot.json</code>, written by anything that can
+              search Slack on your behalf. The shape is documented in
+              <code>lib/slack.js</code>.
+            </p>
+            <p>
+              That suits the problem. Deciding whether a message is a review request is a
+              judgement rather than a pattern match: people post pull request links to ask
+              an unrelated question, to share a branch, or to point at a
+              <code>/tree/</code> URL that is not a pull request at all. Whatever writes the
+              snapshot should read for intent and leave out anything doubtful. A missing
+              chip is invisible, a wrong one is a lie.
+            </p>
+          </section>
+
+          <section id="board">
+            <h2><a class="anchor" href="#board" aria-hidden="true">#</a>What the board shows</h2>
+            <p>
+              The top of the page answers "what now", split into groups because they are
+              different kinds of obligation.
+            </p>
+            <table>
+              <thead>
+                <tr><th style="width: 34%">Section</th><th>What is in it</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Flow</td><td>The ranked list of everything with a next action, led by its most urgent reason</td></tr>
+                <tr><td>Your work</td><td>Your tickets and pull requests, the things only you can finish</td></tr>
+                <tr><td>On hold</td><td>Tickets deliberately parked or blocked, kept out of Your work so neither list is easy to ignore</td></tr>
+                <tr><td>Waiting on you</td><td>Pull requests where someone else is blocked until you review</td></tr>
+                <tr><td>Recently closed</td><td>The last five tickets you closed, as a short history of what moved</td></tr>
+                <tr><td>Recently merged</td><td>The last five pull requests you merged</td></tr>
+              </tbody>
+            </table>
+            <p>
+              Above them, a calendar strip gives the shape of the day, and a
+              <strong>standup summary</strong> collects what you finished, what you are on
+              and what is blocking you since the last working day, colour coded by state and
+              copyable as plain text.
+            </p>
+            <p>
+              An item that trips several rules appears once, led by its most urgent reason.
+              Click a headline count to dim the page to just those items, and press
+              <code>/</code> to search by ticket key, pull request number or title.
+            </p>
+          </section>
+
+          <section id="signals">
+            <h2><a class="anchor" href="#signals" aria-hidden="true">#</a>Signal reference</h2>
+            <p>
+              These rules decide what is worth raising. They are grouped here by colour, in
+              the same severity order the board itself ranks them in.
+            </p>
+            <table>
+              <thead>
+                <tr><th style="width: 32px"></th><th style="width: 32%">Signal</th><th>Why it surfaces</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><span class="sig-dot blocked"></span></td><td>Changes requested</td><td>A reviewer is blocking, and it names who</td></tr>
+                <tr><td><span class="sig-dot blocked"></span></td><td>CI failing</td><td>Checks are red on the latest commit</td></tr>
+                <tr><td><span class="sig-dot blocked"></span></td><td>Merge conflicts</td><td>Cannot land until rebased</td></tr>
+                <tr><td><span class="sig-dot ready"></span></td><td>Ready to merge</td><td>Approved and green, so the label is also the merge button</td></tr>
+                <tr><td><span class="sig-dot review"></span></td><td>Review asked of you</td><td>Requested by name, not via a team</td></tr>
+                <tr><td><span class="sig-dot review"></span></td><td>Waiting on review</td><td>Open 2+ days with no approval</td></tr>
+                <tr><td><span class="sig-dot waiting"></span></td><td>Closed but not shipped</td><td>The ticket is marked done but its PR is still open</td></tr>
+                <tr><td><span class="sig-dot waiting"></span></td><td>Overdue / due soon</td><td>Due date passed or within three days</td></tr>
+                <tr><td><span class="sig-dot waiting"></span></td><td>Ticket needs moving</td><td>Every linked PR merged but the ticket is still open</td></tr>
+                <tr><td><span class="sig-dot waiting"></span></td><td>Ticket out of sync</td><td>The PR is up for review but the ticket is still in To Do</td></tr>
+                <tr><td><span class="sig-dot"></span></td><td>In progress, no PR</td><td>Ticket in flight, quiet 5+ days, nothing pushed</td></tr>
+                <tr><td><span class="sig-dot"></span></td><td>Stale draft</td><td>Draft untouched for a week</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section id="linking">
+            <h2><a class="anchor" href="#linking" aria-hidden="true">#</a>Linking tickets and PRs</h2>
+            <p>
+              Ticket keys such as <code>PROJ-1234</code> are read out of pull request titles
+              and branch names and joined to your Jira issues, so a ticket row shows its
+              pull requests and a PR row shows its ticket. That linking is what powers the
+              out-of-sync checks.
+            </p>
+            <p>
+              If your team uses a placeholder key for "no ticket", set
+              <code>TICKET_PLACEHOLDER_SUFFIX</code> so it is ignored.
+            </p>
+          </section>
+
+          <section id="statuses">
+            <h2><a class="anchor" href="#statuses" aria-hidden="true">#</a>Jira statuses</h2>
+            <p>
+              Two of the rules match on the <em>name</em> of a Jira status rather than its
+              category, because Jira's categories cannot tell "in review" apart from any
+              other work in progress. Teams name these differently, so both are
+              configurable.
+            </p>
+            <table>
+              <thead>
+                <tr><th style="width: 38%">Setting</th><th>Default</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>JIRA_REVIEW_STATUSES</code></td>
+                  <td>code review, in code review, in review, review, reviewing, peer review</td>
+                </tr>
+                <tr>
+                  <td><code>JIRA_PARKED_STATUSES</code></td>
+                  <td>on-hold, on hold, blocked, paused, parked, deferred</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="note">
+              <p>
+                <b>The setup panel names statuses it does not recognise.</b> If none of your
+                in-progress statuses reads as review, the <em>Ticket out of sync</em> rule
+                can never fire, and an absent nudge looks exactly like having nothing to be
+                nudged about. The <strong>Jira statuses</strong> check reports what it found
+                and what each status was taken to mean, so a name the rules do not know is
+                visible rather than inferred from a section that never appears.
+              </p>
+            </div>
+          </section>
+
+          <section id="filters">
+            <h2><a class="anchor" href="#filters" aria-hidden="true">#</a>Filters and per-viewer state</h2>
+            <p>
+              Everything in this section is yours alone. It is stored in
+              <code>localStorage</code> in your browser, never sent to the server and never
+              shared.
+            </p>
+            <table>
+              <thead>
+                <tr><th style="width: 28%">Feature</th><th>What it does</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Repository filter</td><td>Hide repositories you do not want on the board</td></tr>
+                <tr><td>Project filter</td><td>The same, by Jira project key, so one noisy project can be set aside</td></tr>
+                <tr><td>Pinning</td><td>Pin anything to lift it to the top of Your work</td></tr>
+                <tr><td>Critical</td><td>Flag the work that matters more than the rest. Flagged items sort above pins and above every rule. It is your own judgement, not Jira's priority field</td></tr>
+                <tr><td>Notes</td><td>A short note on any ticket, card or parent story, carried into the standup summary where it takes precedence over anything pulled from Jira</td></tr>
+                <tr><td>Theme</td><td>Light or dark</td></tr>
+              </tbody>
+            </table>
+            <p>
+              A <code>#</code> reference in a note links to the thing it names:
+              <code>#ABC-123</code> for a ticket, <code>#42</code> for a pull request.
+              Clicking one runs the same highlight the search box uses, because what is
+              being pointed at is usually in the other column.
+            </p>
+          </section>
+
+          <section id="merging">
+            <h2><a class="anchor" href="#merging" aria-hidden="true">#</a>Merging</h2>
+            <p>
+              A <em>Ready to merge</em> label is also the merge button. Two clicks: the first
+              arms it, the second merges.
+            </p>
+            <p>
+              The server re-checks the preconditions against GitHub at the moment of merging
+              rather than trusting the browser, and reads each repository's allowed merge
+              method rather than assuming one.
+            </p>
+          </section>
+
+          <section id="notifications">
+            <h2><a class="anchor" href="#notifications" aria-hidden="true">#</a>Desktop notifications</h2>
+            <p>
+              Off until you ask for it. <strong>Settings &rsaquo; Notifications &rsaquo;
+              Enable</strong> asks the browser for permission, after which the board can
+              tap you on the shoulder when something needs you. Two categories, each
+              switchable on its own:
+            </p>
+            <table>
+              <thead><tr><th style="width: 34%">Category</th><th>Raised for</th></tr></thead>
+              <tbody>
+                <tr><td>Review asked of you</td><td>Someone is blocked until you look</td></tr>
+                <tr><td>Your PR changed state</td><td>Ready to merge, changes requested, CI failing or merge conflicts</td></tr>
+              </tbody>
+            </table>
+            <p>
+              What is raised comes from the same focus rules the board itself uses, so a
+              notification can never tell you something the board disagrees with. Several
+              at once arrive as a single notification counting them, rather than one popup
+              each, and nothing is raised while you are actually looking at the board.
+            </p>
+            <div class="note">
+              <p>
+                <b>They arrive only while a board tab is open</b>, though it can be a
+                background tab. Raising them with the board closed would need the Push API,
+                which routes through a third-party push service, and sending your work queue
+                to someone else's server is the one thing this project does not do.
+              </p>
+            </div>
+            <div class="note warn">
+              <p>
+                <b>If you ever press Block, the browser will not ask again.</b> The only way
+                back is to allow notifications for the site in your browser's own settings.
+                The panel says so rather than showing a button that cannot work.
+              </p>
+            </div>
+            <p>
+              Nothing is sent anywhere: these are raised by the page itself. The permission
+              is the browser's, and the switches, categories and the record of what has
+              already been announced are stored per-viewer in <code>localStorage</code>.
+            </p>
+          </section>
+
+          <section id="extras">
+            <h2><a class="anchor" href="#extras" aria-hidden="true">#</a>Search, the tour and the game</h2>
+
+            <h3><a class="anchor" href="#extras" aria-hidden="true">#</a>Search</h3>
+            <p>
+              The box in the header filters the board by ticket key, pull request number
+              or title, dimming everything that does not match and outlining what does, the
+              same treatment the headline counts use, since they answer the same question.
+              Press <code>/</code> to focus it and <code>Escape</code> to clear.
+            </p>
+            <p>
+              Keys and numbers get written inconsistently, so matching also compares with
+              every non-alphanumeric character stripped: <code>ABC-123</code>,
+              <code>abc123</code> and <code>123</code> all find the same ticket, and
+              <code>342</code> finds <code>#342</code>.
+            </p>
+
+            <h3><a class="anchor" href="#extras" aria-hidden="true">#</a>The guided tour</h3>
+            <p>
+              The <strong>?</strong> button in the header runs a guided tour: it freezes the
+              page, spotlights each section in turn and explains what it is for. The steps
+              are declared at the top of <code>public/tour.js</code>, anchored to
+              <code>data-tour</code> attributes, and any step whose target is not on the page
+              is skipped. Most sections remove themselves when empty, and stopping on a blank
+              rectangle would be worse than moving on.
+            </p>
+
+            <h3><a class="anchor" href="#extras" aria-hidden="true">#</a>The loading strip</h3>
+            <p>
+              While the board loads, the strip under the header shows an entry from
+              Wikipedia's "on this day". Those picks lean heavily on wars, disasters and
+              killings, because that is what tends to be historically notable, which is a
+              poor fit for something glanced at during standup.
+              <code>lib/facts.js</code> filters that subject matter out and tops the pool
+              back up from the longer events feed for the same day when filtering leaves too
+              little. The matching errs towards discarding: there are far more entries per
+              day than the buffer needs, so a false positive costs nothing.
+            </p>
+
+            <h3><a class="anchor" href="#extras" aria-hidden="true">#</a>Surfing</h3>
+            <p>
+              A small surfing game, in the spirit of Chrome's offline dinosaur. It is offered
+              while the first fetch runs, under the error if that fetch fails, and from
+              Settings at any time. Space or tap to jump, hold for height, down to duck under
+              a low gull.
+            </p>
+            <p>
+              It opens over the board rather than inside it, so a re-render cannot destroy a
+              run. A refresh that finishes while the game is open is held rather than
+              applied: the frame says the board has updated, and shows it when you are ready.
+              Closing the game applies whatever was waiting.
+            </p>
+          </section>
+
+          <section id="status-dots">
+            <h2><a class="anchor" href="#status-dots" aria-hidden="true">#</a>Service status dots</h2>
+            <p>
+              The dots in the header show the public status pages for GitHub, Jira, Claude
+              and Slack. They exist because a degraded upstream makes this board look broken:
+              when GitHub is struggling the review queue quietly goes stale, so anything not
+              operational is named on the button rather than hidden behind a click.
+            </p>
+            <p>
+              No credentials are involved; these are public endpoints. Which services appear
+              is chosen in Settings, and anything running Statuspage can be added by pasting
+              the address of its status page. A page that is not a Statuspage site is
+              rejected when you add it, rather than sitting in the header as a permanent grey
+              dot.
+            </p>
+            <p>
+              The server is what fetches these, so a URL naming a private or loopback address
+              is refused: a settings field should not become a way of reaching things inside
+              the network the server sits in. A status page that cannot be reached is shown
+              as unknown rather than as an outage.
+            </p>
+          </section>
+
+          <section id="config">
+            <h2><a class="anchor" href="#config" aria-hidden="true">#</a>Configuration</h2>
+            <p>
+              Everything is optional and lives in <code>.env</code>. See
+              <code>.env.example</code> for a template. None of it is needed if you sign in
+              with <code>gh</code> and <code>acli</code>.
+            </p>
+
+            <h3><a class="anchor" href="#config" aria-hidden="true">#</a>GitHub</h3>
+            <table>
+              <thead><tr><th style="width: 38%">Variable</th><th>Effect</th></tr></thead>
+              <tbody>
+                <tr><td><code>GITHUB_ORG</code></td><td>Repos outside this org start hidden. Empty shows everything</td></tr>
+                <tr><td><code>GITHUB_TOKEN</code></td><td>A token to use instead of the <code>gh</code> CLI. Wins over the CLI when both are present</td></tr>
+              </tbody>
+            </table>
+
+            <h3><a class="anchor" href="#config" aria-hidden="true">#</a>Jira</h3>
+            <table>
+              <thead><tr><th style="width: 38%">Variable</th><th>Effect</th></tr></thead>
+              <tbody>
+                <tr><td><code>JIRA_ASSIGNEE</code></td><td>Whose board this is. Needed when the credential belongs to someone else</td></tr>
+                <tr><td><code>JIRA_BASE_URL</code><br /><code>JIRA_EMAIL</code><br /><code>JIRA_API_TOKEN</code></td><td>Connects Jira without <code>acli</code>. All three or none</td></tr>
+                <tr><td><code>JIRA_CLOUD_ID</code></td><td>Only for <em>scoped</em> tokens, which must use Atlassian's gateway</td></tr>
+                <tr><td><code>JIRA_JQL</code></td><td>Which tickets count as yours</td></tr>
+                <tr><td><code>JIRA_PARKED_STATUSES</code></td><td>Statuses meaning "deliberately parked", such as On-Hold</td></tr>
+                <tr><td><code>JIRA_REVIEW_STATUSES</code></td><td>Statuses meaning "in review". Without one of these the out-of-sync rule cannot fire</td></tr>
+                <tr><td><code>TICKET_PLACEHOLDER_SUFFIX</code></td><td>Ticket keys ending in this mean "no ticket"</td></tr>
+              </tbody>
+            </table>
+
+            <h3><a class="anchor" href="#config" aria-hidden="true">#</a>Calendar</h3>
+            <table>
+              <thead><tr><th style="width: 38%">Variable</th><th>Effect</th></tr></thead>
+              <tbody>
+                <tr><td><code>CALENDAR_AUTOSYNC</code></td><td><code>off</code> stops the background macOS Calendar refresh</td></tr>
+                <tr><td><code>CALENDAR_ICS_URL</code></td><td>A calendar's private iCal address</td></tr>
+                <tr><td><code>CALENDAR_NO_WAIT</code></td><td>Skips the brief pause the sync script leaves after opening Calendar.app. Useful when scripting it somewhere Calendar is already running</td></tr>
+              </tbody>
+            </table>
+
+            <h3><a class="anchor" href="#config" aria-hidden="true">#</a>Server</h3>
+            <table>
+              <thead><tr><th style="width: 38%">Variable</th><th>Effect</th></tr></thead>
+              <tbody>
+                <tr><td><code>PORT</code></td><td>Defaults to 4319</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section id="privacy">
+            <h2><a class="anchor" href="#privacy" aria-hidden="true">#</a>What leaves your machine</h2>
+            <p>
+              The server talks to GitHub, to Jira, to the public status pages you have
+              chosen, and to Wikipedia for the loading strip. That is the whole list. There
+              is no telemetry, no analytics and no account.
+            </p>
+            <p>
+              Credentials are read from <code>gh</code>, from <code>acli</code> or from your
+              own <code>.env</code>, and are never written anywhere by this project. The
+              setup panel collects nothing: a token typed into a web field is worse off than
+              one in a file, so credentials are named, their file is pointed at, and that is
+              all. Each check reports where a credential came from and whether it worked,
+              never the credential itself.
+            </p>
+            <p>
+              Your pins, notes, filters, critical flags and theme live in
+              <code>localStorage</code> in your own browser.
+            </p>
+          </section>
+
+          <section id="troubleshooting">
+            <h2><a class="anchor" href="#troubleshooting" aria-hidden="true">#</a>Troubleshooting</h2>
+            <p>
+              Start with <strong>Check setup</strong> in Settings. It names each source, says
+              whether it is working and gives you the command to fix it.
+            </p>
+            <table>
+              <thead><tr><th style="width: 40%">Symptom</th><th>Usually</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>Jira authenticates but shows no tickets</td>
+                  <td>The credential belongs to a shared or admin account that owns none of your work. Set <code>JIRA_ASSIGNEE</code></td>
+                </tr>
+                <tr>
+                  <td>Tickets with open PRs never flag as out of sync</td>
+                  <td>None of your in-progress statuses is recognised as review. Set <code>JIRA_REVIEW_STATUSES</code></td>
+                </tr>
+                <tr>
+                  <td>No On hold section</td>
+                  <td>Your parked status is named something the defaults do not cover. Set <code>JIRA_PARKED_STATUSES</code></td>
+                </tr>
+                <tr>
+                  <td>Pull requests missing, or zero reviews</td>
+                  <td>The token is not being found. Check <code>gh auth status</code>, and remember a launcher with a minimal <code>PATH</code> may not find <code>gh</code> at all</td>
+                </tr>
+                <tr>
+                  <td>The calendar strip claims a free day</td>
+                  <td>The snapshot is stale. It refreshes in the background at most every half hour, and says so rather than guessing</td>
+                </tr>
+                <tr>
+                  <td>A scoped Jira token 401s</td>
+                  <td>Scoped tokens need <code>JIRA_CLOUD_ID</code> and Atlassian's gateway</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section id="architecture">
+            <h2><a class="anchor" href="#architecture" aria-hidden="true">#</a>How it is built</h2>
+            <table>
+              <thead><tr><th style="width: 38%">File</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><code>server.js</code></td><td>HTTP server, static files and the JSON API</td></tr>
+                <tr><td><code>lib/github.js</code></td><td>GraphQL for pull requests, REST for notifications and merging</td></tr>
+                <tr><td><code>lib/jira.js</code></td><td>Jira REST v3, with a snapshot-file fallback</td></tr>
+                <tr><td><code>lib/acli.js</code></td><td>The Atlassian CLI adapter</td></tr>
+                <tr><td><code>lib/focus.js</code></td><td>The ranking rules and the ticket/PR linking</td></tr>
+                <tr><td><code>lib/calendar.js</code></td><td>iCalendar parsing, free-time arithmetic</td></tr>
+                <tr><td><code>lib/slack.js</code></td><td>Review requests read from a snapshot</td></tr>
+                <tr><td><code>lib/status.js</code></td><td>Public status pages</td></tr>
+                <tr><td><code>lib/setup.js</code></td><td>The connection checks behind the setup panel</td></tr>
+                <tr><td><code>lib/facts.js</code></td><td>Wikipedia "On this day", for the loading strip</td></tr>
+                <tr><td><code>public/</code></td><td>The single-page front end</td></tr>
+                <tr><td><code>scripts/sync-calendar.mjs</code></td><td>Writes today's meetings from macOS Calendar</td></tr>
+                <tr><td><code>test/</code></td><td><code>node --test</code>, no framework</td></tr>
+              </tbody>
+            </table>
+            <p>
+              Data refreshes on load, on <strong>Refresh</strong> and every five minutes.
+              Responses are cached for 60 seconds.
+            </p>
+            <div class="cmd">
+              <button class="copy" type="button">copy</button>
+              <pre><span class="p">$</span> <span class="c">npm test</span></pre>
+            </div>
+            <p>
+              <code>lib/focus.js</code> holds the ranking rules and is the part most worth
+              covering.
+            </p>
+          </section>
+
+          <section id="licence">
+            <h2><a class="anchor" href="#licence" aria-hidden="true">#</a>Licence</h2>
+            <p>
+              An internal Upwind project. It is not open source and carries no licence
+              granting its use, copying or redistribution.
+            </p>
+            <p>
+              The notices below are not ours to drop: they are the terms the bundled font
+              and the GitHub mark are used under, and they stand whoever the project
+              belongs to.
+            </p>
+            <p>
+              The board and this site are set in
+              <a href="https://github.com/erikdkennedy/figtree">Figtree</a> by Erik Kennedy,
+              used under the SIL Open Font License. The font files are served from this
+              repository rather than a font CDN, so the page makes no third-party request,
+              and the licence sits beside them.
+            </p>
+            <p>
+              GitHub's mark is from <a href="https://primer.style/octicons">Octicons</a>
+              (MIT, &copy; GitHub Inc.) and is GitHub's trademark, used only to label the
+              integration.
+            </p>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <span>current</span>
+        <span class="right">
+          <a href="/">Home</a>
+          <a href="mailto:dylan.martin@upwind.io?subject=current">Contact</a>
+        </span>
+      </div>
+    </footer>
+
+    <script>
+      /* Theme toggle. Matches the landing page: no stored choice means light,
+         unconditionally, and the page never consults the system. */
+      (function () {
+        var root = document.documentElement;
+        var button = document.getElementById('theme');
+        button.addEventListener('click', function () {
+          var next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+          root.dataset.theme = next;
+          try {
+            localStorage.setItem('current-docs-theme', next);
+          } catch (e) {}
+        });
+      })();
+
+      /* Copy buttons. The marker spans are prompts rather than content, so the
+         text is rebuilt from the lines with those stripped out. */
+      document.querySelectorAll('.cmd').forEach(function (box) {
+        var button = box.querySelector('.copy');
+        var pre = box.querySelector('pre');
+        if (!button || !pre) return;
+        /* The async clipboard API needs a secure context. Everything else gets
+           the old selection trick rather than a dead button. */
+        function write(text) {
+          if (navigator.clipboard && window.isSecureContext) {
+            return navigator.clipboard.writeText(text);
+          }
+          return new Promise(function (resolve, reject) {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'fixed';
+            ta.style.top = '-1000px';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+              document.execCommand('copy') ? resolve() : reject(new Error('refused'));
+            } catch (e) {
+              reject(e);
+            } finally {
+              ta.remove();
+            }
+          });
+        }
+
+        button.addEventListener('click', function () {
+          var text = pre.innerText
+            .split('\n')
+            .map(function (line) {
+              return line.replace(/^\s*\$\s?/, '');
+            })
+            .join('\n')
+            .trim();
+          write(text).then(
+            function () {
+              button.textContent = 'copied';
+              setTimeout(function () {
+                button.textContent = 'copy';
+              }, 1400);
+            },
+            function () {
+              button.textContent = 'failed';
+              setTimeout(function () {
+                button.textContent = 'copy';
+              }, 1400);
+            },
+          );
+        });
+      });
+
+      /*
+       * Scroll spy.
+       *
+       * rootMargin pins the trigger line near the top of the viewport, so the
+       * highlighted entry is the heading you are reading rather than whichever
+       * section happens to be largest. The last section is short enough that it
+       * may never cross that line, so the foot of the page selects it outright.
+       */
+      (function () {
+        var toc = document.getElementById('toc');
+        var links = [].slice.call(toc.querySelectorAll('a[href^="#"]'));
+        var byId = {};
+        links.forEach(function (a) {
+          byId[a.getAttribute('href').slice(1)] = a;
+        });
+        var sections = links
+          .map(function (a) {
+            return document.getElementById(a.getAttribute('href').slice(1));
+          })
+          .filter(Boolean);
+
+        function mark(id) {
+          links.forEach(function (a) {
+            a.classList.toggle('here', a === byId[id]);
+          });
+        }
+
+        /*
+         * The entry to light is the last section whose top has passed the
+         * trigger line, which is the heading you are reading. Picking the first
+         * section merely intersecting a band highlights the one above it, since
+         * two sections are usually in view at once.
+         */
+        var LINE = 100;
+        function current() {
+          if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 4) {
+            return sections[sections.length - 1];
+          }
+          var best = sections[0];
+          for (var i = 0; i < sections.length; i++) {
+            if (sections[i].getBoundingClientRect().top <= LINE) best = sections[i];
+          }
+          return best;
+        }
+
+        var queued = false;
+        function update() {
+          queued = false;
+          var section = current();
+          if (section) mark(section.id);
+        }
+        /* One read per frame at most: this runs on every scroll event, and
+           getBoundingClientRect forces layout. */
+        function onScroll() {
+          if (queued) return;
+          queued = true;
+          requestAnimationFrame(update);
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', onScroll);
+        update();
+      })();
+
+      /* The sidebar is a disclosure only on a phone; on a wide screen it is
+         always open, and opening it here keeps that true after a resize. */
+      (function () {
+        var toc = document.getElementById('toc');
+        var wide = window.matchMedia('(min-width: 901px)');
+        function sync() {
+          if (wide.matches) toc.open = true;
+        }
+        sync();
+        wide.addEventListener('change', sync);
+        /* Choosing a destination on a phone should close the list behind you. */
+        toc.querySelectorAll('a').forEach(function (a) {
+          a.addEventListener('click', function () {
+            if (!wide.matches) toc.open = false;
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>
