@@ -504,6 +504,68 @@
 
     <script src="wave.js?v=9" defer></script>
     <script>
+      /*
+       * Keep the address bar on the bare domain.
+       *
+       * The section links scroll, they do not navigate, so the URL has no
+       * business picking up a fragment and showing howsyourflow.io/#board.
+       * scrollIntoView rather than setting location.hash, because assigning
+       * the hash pushes a history entry and four nav clicks would then take
+       * four presses of back to leave the page.
+       */
+      (function () {
+        function path() {
+          return location.pathname + location.search;
+        }
+        function scrollTo(id) {
+          var el = id ? document.getElementById(id) : null;
+          if (id && !el) return false;
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          else window.scrollTo({ top: 0, behavior: 'smooth' });
+          return true;
+        }
+        document.addEventListener('click', function (event) {
+          var link = event.target.closest && event.target.closest('a[href^="#"]');
+          if (!link) return;
+          var id = link.getAttribute('href').slice(1);
+          if (!scrollTo(id)) return;
+          event.preventDefault();
+          try {
+            history.replaceState(null, '', path());
+          } catch (e) {
+            /* Some privacy modes refuse this; the scroll has already happened. */
+          }
+        });
+
+        /*
+         * A fragment appearing without a page load: the browser's own back and
+         * forward buttons, or a link followed while already here. Nothing
+         * reloads, so the arrival handling below never runs for these.
+         */
+        window.addEventListener('hashchange', function () {
+          if (!location.hash) return;
+          scrollTo(location.hash.slice(1));
+          try {
+            history.replaceState(null, '', path());
+          } catch (e) {}
+        });
+
+        /* Arriving with a fragment, from an old link or from the docs nav,
+           still lands in the right place before the fragment is dropped. */
+        if (location.hash) {
+          var target = location.hash.slice(1);
+          /* A timer rather than requestAnimationFrame: a tab opened in the
+             background has its frames paused, so the fragment would sit in the
+             address bar until the tab was looked at. Timers still fire. */
+          setTimeout(function () {
+            scrollTo(target);
+            try {
+              history.replaceState(null, '', path());
+            } catch (e) {}
+          }, 0);
+        }
+      })();
+
       /* Theme toggle. Every storage call is guarded: a private window, cleared
          site data or a browser set to block storage throws on access itself,
          and the page has to render correctly with no stored value. */
