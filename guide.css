@@ -71,13 +71,26 @@
 
 .docs-body { min-width: 0; }
 
+/*
+ * One rule owns the space between sections.
+ *
+ * Three were stacking: 56px of padding under the section that ended, 56px over
+ * the one that started, both inherited from the landing page's own section
+ * rule, and then another 52px of margin on the heading. That came to 179px of
+ * nothing between one topic and the next, which on a reference page reads as
+ * the document having finished.
+ */
+.docs-body section {
+  padding: 34px 0 0;
+}
+.docs-body > section:first-child { padding-top: 0; }
+
 .docs-body h2 {
   font-size: 26px;
   line-height: 1.25;
-  margin: 52px 0 14px;
+  margin: 0 0 14px;
   scroll-margin-top: 90px;
 }
-.docs-body > section:first-child h2 { margin-top: 0; }
 
 .docs-body h3 {
   font-size: 17px;
@@ -242,7 +255,8 @@
   }
   .docs-nav .toc { padding: 0 16px 14px; }
   .docs-nav .group:first-child { margin-top: 4px; }
-  .docs-body h2 { font-size: 22px; margin-top: 40px; }
+  .docs-body h2 { font-size: 22px; }
+  .docs-body section { padding-top: 26px; }
   .anchor { display: none; }
 }
 
