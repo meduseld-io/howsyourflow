@@ -122,11 +122,13 @@
             <h2><a class="anchor" href="#quick-start" aria-hidden="true">#</a>Quick start</h2>
             <p>You need <strong>Node 18 or later</strong>. Nothing else is installed.</p>
             <p>
-              The repository is internal to Upwind. Ask in engineering for the address.
+              The repository is internal to Upwind:
+              <a href="https://github.com/upwindsecurity/engineering-devtools">upwindsecurity/engineering-devtools</a>. Its README carries
+              the setup that is specific to Upwind, which is the part this page leaves out.
             </p>
             <div class="cmd">
               <button class="copy" type="button">copy</button>
-              <pre><span class="p">$</span> <span class="c">git clone</span> <span class="m">&lt;the Upwind repository&gt;</span>
+              <pre><span class="p">$</span> <span class="c">git clone</span> git@github.com:upwindsecurity/engineering-devtools.git
 <span class="p">$</span> <span class="c">cd</span> current
 <span class="p">$</span> <span class="c">npm start</span></pre>
             </div>
@@ -181,36 +183,26 @@
           <section id="jira">
             <h2><a class="anchor" href="#jira" aria-hidden="true">#</a>Connecting Jira</h2>
             <p>
-              Three routes, tried in that order. The first asks the least of you. All three
-              produce the same board through the same shaping code, so nothing on screen
-              depends on which door opened.
+              Two routes. Both produce the same board through the same shaping code, so
+              nothing on screen depends on which door opened.
             </p>
 
-            <h3><a class="anchor" href="#jira" aria-hidden="true">#</a>1. The Atlassian CLI</h3>
-            <div class="cmd">
-              <button class="copy" type="button">copy</button>
-              <pre><span class="p">$</span> <span class="c">brew install</span> atlassian/acli/acli
-<span class="p">$</span> <span class="c">acli jira auth login</span> --web</pre>
-            </div>
-            <p>
-              <a href="https://developer.atlassian.com/cloud/acli/">Atlassian's CLI</a>
-              signs in through your browser with OAuth. There is no token to create,
-              nothing to paste into a file, and no administrator to ask, which is the step
-              that stops people in organisations where self-service token creation is
-              switched off.
-            </p>
-
-            <h3><a class="anchor" href="#jira" aria-hidden="true">#</a>2. An API token</h3>
+            <h3><a class="anchor" href="#jira" aria-hidden="true">#</a>1. An API token</h3>
             <p>
               Set <code>JIRA_BASE_URL</code>, <code>JIRA_EMAIL</code> and
               <a href="https://id.atlassian.com/manage-profile/security/api-tokens"><code>JIRA_API_TOKEN</code></a>
               in <code>.env</code>. All three or none.
             </p>
-            <p>
-              Use this route when <code>acli</code> is not available to you, or when the
-              credential has to belong to a different account from the one you are signed
-              in as. In that case also set <code>JIRA_ASSIGNEE</code> to your own address.
-            </p>
+            <div class="note warn">
+              <p>
+                <b>Your organisation may have switched off self-service tokens.</b> The
+                plain <em>Create API token</em> button is greyed out with "An admin blocked
+                your tokens", and <em>Create API token with scopes</em> leads to an app
+                picker that may not offer Jira at all. That is a policy rather than a wall:
+                an administrator can usually provision a token on request, so it is worth
+                asking before falling back to a snapshot.
+              </p>
+            </div>
             <div class="note warn">
               <p>
                 <b>Scoped tokens</b> must go through Atlassian's gateway rather than your
@@ -220,25 +212,41 @@
             </div>
             <div class="note">
               <p>
+                <b>A token belongs to the account that created it.</b> Basic auth sends the
+                email and the token as a matched pair, so an administrator's token paired
+                with your own address fails, and it fails silently: Jira answers
+                <code>401</code> exactly as it answers a request carrying no credentials at
+                all. Pair a token with its owner's email, then set
+                <code>JIRA_ASSIGNEE</code> to the person the board is actually about.
+              </p>
+            </div>
+            <div class="note">
+              <p>
                 <b>A shared or admin token reports zero tickets.</b> Jira's
                 <code>currentUser()</code> is whoever owns the token, so an administrative
                 account authenticates perfectly and then owns none of your work, which
-                looks exactly like an empty board. Set <code>JIRA_ASSIGNEE</code> to the
-                email or account id the board is actually about and the header will name
-                that person rather than whoever holds the credentials.
+                looks exactly like an empty board. <code>JIRA_ASSIGNEE</code> names the
+                person instead, and the header will say who that is rather than who holds
+                the credentials.
               </p>
             </div>
 
-            <h3><a class="anchor" href="#jira" aria-hidden="true">#</a>3. A snapshot file</h3>
+            <h3><a class="anchor" href="#jira" aria-hidden="true">#</a>2. A snapshot file</h3>
             <p>
-              Where even the CLI is restricted, the board reads
-              <code>data/jira-snapshot.json</code>, so it can be fed by any process that
-              <em>can</em> reach Jira: a script, a scheduled job or an assistant with a Jira
-              integration. The file's shape is documented in <code>lib/jira.js</code>.
+              Where no token is available, the board reads
+              <code>data/jira-snapshot.json</code>, so it can be fed by anything that
+              <em>can</em> reach Jira: a script, a scheduled job, or an assistant with a
+              Jira integration running the queries on your behalf. The board reads it like
+              any other source and says how old it is, so a stale day is never passed off
+              as a quiet one.
+            </p>
+            <p>
+              The schema, and a prompt that fills the file through an assistant, are in
+              <a href="https://github.com/upwindsecurity/engineering-devtools">the repository's</a> own
+              <code>docs/jira-snapshot.md</code>.
             </p>
             <p>Leave all of it unset to run GitHub-only.</p>
           </section>
-
           <section id="calendar">
             <h2><a class="anchor" href="#calendar" aria-hidden="true">#</a>Calendar</h2>
             <p>
@@ -595,14 +603,13 @@
             <p>
               Everything is optional and lives in <code>.env</code>. See
               <code>.env.example</code> for a template. None of it is needed if you sign in
-              with <code>gh</code> and <code>acli</code>.
+              with <code>gh</code>.
             </p>
 
             <h3><a class="anchor" href="#config" aria-hidden="true">#</a>GitHub</h3>
             <table>
               <thead><tr><th style="width: 38%">Variable</th><th>Effect</th></tr></thead>
               <tbody>
-                <tr><td><code>GITHUB_ORG</code></td><td>Repos outside this org start hidden. Empty shows everything</td></tr>
                 <tr><td><code>GITHUB_TOKEN</code></td><td>A token to use instead of the <code>gh</code> CLI. Wins over the CLI when both are present</td></tr>
               </tbody>
             </table>
@@ -612,12 +619,11 @@
               <thead><tr><th style="width: 38%">Variable</th><th>Effect</th></tr></thead>
               <tbody>
                 <tr><td><code>JIRA_ASSIGNEE</code></td><td>Whose board this is. Needed when the credential belongs to someone else</td></tr>
-                <tr><td><code>JIRA_BASE_URL</code><br /><code>JIRA_EMAIL</code><br /><code>JIRA_API_TOKEN</code></td><td>Connects Jira without <code>acli</code>. All three or none</td></tr>
+                <tr><td><code>JIRA_BASE_URL</code><br /><code>JIRA_EMAIL</code><br /><code>JIRA_API_TOKEN</code></td><td>Connects Jira directly, instead of through a snapshot. All three or none</td></tr>
                 <tr><td><code>JIRA_CLOUD_ID</code></td><td>Only for <em>scoped</em> tokens, which must use Atlassian's gateway</td></tr>
                 <tr><td><code>JIRA_JQL</code></td><td>Which tickets count as yours</td></tr>
                 <tr><td><code>JIRA_PARKED_STATUSES</code></td><td>Statuses meaning "deliberately parked", such as On-Hold</td></tr>
                 <tr><td><code>JIRA_REVIEW_STATUSES</code></td><td>Statuses meaning "in review". Without one of these the out-of-sync rule cannot fire</td></tr>
-                <tr><td><code>TICKET_PLACEHOLDER_SUFFIX</code></td><td>Ticket keys ending in this mean "no ticket"</td></tr>
               </tbody>
             </table>
 
@@ -648,8 +654,8 @@
               is no telemetry, no analytics and no account.
             </p>
             <p>
-              Credentials are read from <code>gh</code>, from <code>acli</code> or from your
-              own <code>.env</code>, and are never written anywhere by this project. The
+              Credentials are read from <code>gh</code> or from your own <code>.env</code>,
+              and are never written anywhere by this project. The
               setup panel collects nothing: a token typed into a web field is worse off than
               one in a file, so credentials are named, their file is pointed at, and that is
               all. Each check reports where a credential came from and whether it worked,
@@ -706,7 +712,6 @@
                 <tr><td><code>server.js</code></td><td>HTTP server, static files and the JSON API</td></tr>
                 <tr><td><code>lib/github.js</code></td><td>GraphQL for pull requests, REST for notifications and merging</td></tr>
                 <tr><td><code>lib/jira.js</code></td><td>Jira REST v3, with a snapshot-file fallback</td></tr>
-                <tr><td><code>lib/acli.js</code></td><td>The Atlassian CLI adapter</td></tr>
                 <tr><td><code>lib/focus.js</code></td><td>The ranking rules and the ticket/PR linking</td></tr>
                 <tr><td><code>lib/calendar.js</code></td><td>iCalendar parsing, free-time arithmetic</td></tr>
                 <tr><td><code>lib/slack.js</code></td><td>Review requests read from a snapshot</td></tr>

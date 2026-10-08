@@ -99,7 +99,7 @@
             <span>terminal</span>
           </div>
           <button class="copy" id="copy" type="button">copy</button>
-          <pre id="install"><span class="p">$</span> <span class="c">git clone</span> <span class="m">&lt;the Upwind repository&gt;</span>
+          <pre id="install"><span class="p">$</span> <span class="c">git clone</span> git@github.com:upwindsecurity/engineering-devtools.git
 <span class="p">$</span> <span class="c">cd</span> current
 <span class="p">$</span> <span class="c">npm start</span></pre>
         </div>
@@ -387,14 +387,10 @@
             <p class="card-note">Tickets, standup summary, ticket and PR linking.</p>
             <ol class="routes">
               <li>
-                <span class="tag best">CLI</span>
-                <code>acli jira auth login --web</code>. OAuth in your browser. No token to
-                create and no administrator to ask.
-              </li>
-              <li>
-                <span class="tag">Token</span>
+                <span class="tag best">Token</span>
                 <code>JIRA_BASE_URL</code>, <code>JIRA_EMAIL</code> and
-                <code>JIRA_API_TOKEN</code> in <code>.env</code>.
+                <code>JIRA_API_TOKEN</code> in <code>.env</code>. Where self-service tokens
+                are switched off, an administrator can usually provision one.
               </li>
               <li>
                 <span class="tag">Snapshot</span>
@@ -462,15 +458,14 @@
             <span class="code-dots"><i></i><i></i><i></i></span>
             <span>terminal</span>
           </div>
-          <pre><span class="p">$</span> <span class="c">git clone</span> <span class="m">&lt;the Upwind repository&gt;</span>
+          <pre><span class="p">$</span> <span class="c">git clone</span> git@github.com:upwindsecurity/engineering-devtools.git
 <span class="p">$</span> <span class="c">cd</span> current
 <span class="p">$</span> <span class="c">npm start</span>
 
   current → http://localhost:4319
 
-<span class="p">#</span> <span class="m">then sign in to whichever of these you use</span>
-<span class="p">$</span> <span class="c">gh auth login</span>
-<span class="p">$</span> <span class="c">acli jira auth login</span> --web</pre>
+<span class="p">#</span> <span class="m">GitHub borrows your existing CLI session</span>
+<span class="p">$</span> <span class="c">gh auth login</span></pre>
         </div>
 
         <div class="cards">
