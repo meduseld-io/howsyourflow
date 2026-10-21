@@ -130,7 +130,18 @@
               <button class="copy" type="button">copy</button>
               <pre><span class="p">$</span> <span class="c">git clone</span> <span class="m">&lt;the Upwind repository&gt;</span>
 <span class="p">$</span> <span class="c">cd</span> current
-<span class="p">$</span> <span class="c">npm start</span></pre>
+<span class="p">$</span> <span class="c">npm run setup</span></pre>
+            </div>
+            <p>
+              The walkthrough checks Node, creates your <code>.env</code>, reports which
+              sources are connected, offers to sign you in to GitHub, reads your calendar,
+              and is honest about the one step it cannot do for you. It asks before
+              anything with a side effect and is safe to re-run. Pass
+              <code>-- --check</code> to see what it would do without it doing anything.
+            </p>
+            <div class="cmd">
+              <button class="copy" type="button">copy</button>
+              <pre><span class="p">$</span> <span class="c">npm start</span></pre>
             </div>
             <p>Then open <a href="http://localhost:4319">http://localhost:4319</a>.</p>
             <p>
