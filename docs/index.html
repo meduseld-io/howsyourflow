@@ -223,6 +223,39 @@
               The schema, and a prompt that fills the file through an assistant, are in
               the repository's own <code>docs/jira-snapshot.md</code>.
             </p>
+            <h4>Keeping it fresh</h4>
+            <p>
+              Refreshing it by hand gets dull, so ask your assistant for a scheduled task
+              that reruns the prompt every half hour. The board shows each snapshot's age,
+              so you can see at a glance whether the schedule is really running.
+            </p>
+            <div class="note">
+              <p>
+                <b>Write the file directly, not through the shell.</b> A scheduled run has
+                nobody present to approve a command whose text changes every time, so a
+                task that builds its JSON with <code>node -e</code>, a heredoc or
+                <code>jq</code> stops and waits for a permission that never comes. From the
+                outside that is indistinguishable from the task never having run. Keep the
+                shell to one fixed command, <code>node scripts/check-snapshots.mjs</code>,
+                which validates the files and can be allowed once.
+              </p>
+            </div>
+            <div class="note">
+              <p>
+                <b>Point the task at the checkout the board runs from.</b> With more than
+                one clone, a task will refresh the one nobody is looking at, every half
+                hour, successfully, and nothing reports an error. A snapshot age in
+                <strong>Check setup</strong> that is older than the schedule means the task
+                is writing somewhere else.
+              </p>
+            </div>
+            <div class="note warn">
+              <p>
+                <b>On failure, leave the old file alone.</b> A stale snapshot is labelled
+                as stale. An empty one reads as "no tickets", which is a worse lie than
+                being out of date.
+              </p>
+            </div>
 
             <h3><a class="anchor" href="#jira" aria-hidden="true">#</a>2. An API token</h3>
             <p>
