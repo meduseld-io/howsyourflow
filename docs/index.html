@@ -129,7 +129,7 @@
             <div class="cmd">
               <button class="copy" type="button">copy</button>
               <pre><span class="p">$</span> <span class="c">git clone</span> <span class="m">&lt;the Upwind repository&gt;</span>
-<span class="p">$</span> <span class="c">cd</span> current
+<span class="p">$</span> <span class="c">cd</span> <span class="m">&lt;the repo&gt;</span>/current
 <span class="p">$</span> <span class="c">npm run setup</span></pre>
             </div>
             <p>
@@ -139,6 +139,17 @@
               anything with a side effect and is safe to re-run. Pass
               <code>-- --check</code> to see what it would do without it doing anything.
             </p>
+            <p>
+              On a Mac the last step offers to build the app, which is the way to run this.
+              It sits in your dock, starts the board itself and can tell you a meeting is
+              about to start with its window shut. A browser tab is the first thing you
+              close.
+            </p>
+            <div class="cmd">
+              <button class="copy" type="button">copy</button>
+              <pre><span class="p">$</span> <span class="c">open</span> ~/Applications/current.app</pre>
+            </div>
+            <p>Or keep it in a tab instead.</p>
             <div class="cmd">
               <button class="copy" type="button">copy</button>
               <pre><span class="p">$</span> <span class="c">npm start</span></pre>
@@ -177,8 +188,8 @@
             <p>
               If <code>gh</code> is not installed or not an option on your machine, put a
               <a href="https://github.com/settings/tokens">personal access token</a> with
-              the <code>repo</code> and <code>notifications</code> scopes in
-              <code>.env</code> instead.
+              the <code>repo</code> scope in <code>.env</code> instead. Notifications need
+              nothing beyond it.
             </p>
             <div class="cmd">
               <button class="copy" type="button">copy</button>
@@ -198,7 +209,22 @@
               nothing on screen depends on which door opened.
             </p>
 
-            <h3><a class="anchor" href="#jira" aria-hidden="true">#</a>1. An API token</h3>
+            <h3><a class="anchor" href="#jira" aria-hidden="true">#</a>1. A snapshot file</h3>
+            <p>
+              The route to start on, because it asks nothing of anybody. The board reads
+              <code>data/jira-snapshot.json</code>, so it can be fed by anything that
+              <em>can</em> reach Jira: a script, a scheduled job, or an assistant with a
+              Jira integration, such as Claude through the Atlassian connector,
+              running the queries on your behalf. The board reads it like
+              any other source and says how old it is, so a stale day is never passed off
+              as a quiet one.
+            </p>
+            <p>
+              The schema, and a prompt that fills the file through an assistant, are in
+              the repository's own <code>docs/jira-snapshot.md</code>.
+            </p>
+
+            <h3><a class="anchor" href="#jira" aria-hidden="true">#</a>2. An API token</h3>
             <p>
               Set <code>JIRA_BASE_URL</code>, <code>JIRA_EMAIL</code> and
               <a href="https://id.atlassian.com/manage-profile/security/api-tokens"><code>JIRA_API_TOKEN</code></a>
@@ -211,7 +237,7 @@
                 your tokens", and <em>Create API token with scopes</em> leads to an app
                 picker that may not offer Jira at all. That is a policy rather than a wall:
                 an administrator can usually provision a token on request, so it is worth
-                asking before falling back to a snapshot.
+                doing if you would rather not keep a snapshot up to date.
               </p>
             </div>
             <div class="note warn">
@@ -242,19 +268,6 @@
               </p>
             </div>
 
-            <h3><a class="anchor" href="#jira" aria-hidden="true">#</a>2. A snapshot file</h3>
-            <p>
-              Where no token is available, the board reads
-              <code>data/jira-snapshot.json</code>, so it can be fed by anything that
-              <em>can</em> reach Jira: a script, a scheduled job, or an assistant with a
-              Jira integration running the queries on your behalf. The board reads it like
-              any other source and says how old it is, so a stale day is never passed off
-              as a quiet one.
-            </p>
-            <p>
-              The schema, and a prompt that fills the file through an assistant, are in
-              the repository's own <code>docs/jira-snapshot.md</code>.
-            </p>
             <p>Leave all of it unset to run GitHub-only.</p>
           </section>
           <section id="calendar">

@@ -100,8 +100,8 @@
           </div>
           <button class="copy" id="copy" type="button">copy</button>
           <pre id="install"><span class="p">$</span> <span class="c">git clone</span> <span class="m">&lt;the Upwind repository&gt;</span>
-<span class="p">$</span> <span class="c">cd</span> current
-<span class="p">$</span> <span class="c">npm start</span></pre>
+<span class="p">$</span> <span class="c">cd</span> <span class="m">&lt;the repo&gt;</span>/current
+<span class="p">$</span> <span class="c">npm run setup</span></pre>
         </div>
 
         <div class="cta">
@@ -355,8 +355,8 @@
         <h2>Every source has more than one door</h2>
         <p class="section-lede">
           Nothing here assumes a CLI is already installed or that your organisation will
-          hand you an API token. Each source lists its routes in the order the board tries
-          them, and the first one asks the least of you.
+          hand you an API token. Each source lists the route that asks the least of you
+          first. Set two and the explicit one in <code>.env</code> wins.
         </p>
         <p class="section-lede">
           Settings holds a
@@ -375,9 +375,9 @@
               </li>
               <li>
                 <span class="tag">Token</span>
-                <code>GITHUB_TOKEN</code> in <code>.env</code>, with the <code>repo</code> and
-                <code>notifications</code> scopes. Wins over the CLI, which is how you point
-                at another account.
+                <code>GITHUB_TOKEN</code> in <code>.env</code>, with the <code>repo</code>
+                scope, which already covers notifications. Wins over the CLI, which is how
+                you point at another account.
               </li>
             </ol>
           </div>
@@ -387,14 +387,20 @@
             <p class="card-note">Tickets, standup summary, ticket and PR linking.</p>
             <ol class="routes">
               <li>
-                <span class="tag best">Token</span>
-                <code>JIRA_BASE_URL</code>, <code>JIRA_EMAIL</code> and
-                <code>JIRA_API_TOKEN</code> in <code>.env</code>. Where self-service tokens
-                are switched off, an administrator can usually provision one.
+                <span class="tag best">Connector</span>
+                <code>data/jira-snapshot.json</code>, written by Claude through the Atlassian
+                connector. Nothing to request and nobody to ask, which is why it is the
+                route to start on.
               </li>
               <li>
-                <span class="tag">Snapshot</span>
-                <code>data/jira-snapshot.json</code>, written by anything that can reach Jira.
+                <span class="tag">Token</span>
+                <code>JIRA_BASE_URL</code>, <code>JIRA_EMAIL</code> and
+                <code>JIRA_API_TOKEN</code> in <code>.env</code>, which wins over the
+                snapshot once set. Where self-service tokens are switched off an
+                administrator can usually provision one. Pair it with the email of whoever
+                owns it, set <code>JIRA_ASSIGNEE</code> when that is not you, or the board
+                authenticates perfectly and reports no tickets, and add
+                <code>JIRA_CLOUD_ID</code> if the token is a scoped one.
               </li>
             </ol>
           </div>
@@ -440,10 +446,16 @@
     <section id="start">
       <div class="wrap">
         <p class="eyebrow">Quick start</p>
-        <h2>Three commands, then open a tab</h2>
+        <h2>Three commands, then it lives in your dock</h2>
         <p class="section-lede">
           You need Node 18 or later. There is nothing to install: the project has no
           dependencies, so there is no <code>node_modules</code> and no lockfile to audit.
+        </p>
+        <p class="section-lede">
+          On a Mac, take the app. <code>npm run setup</code> offers to build and install it
+          at the end, and it then sits in your dock, starts the board itself and can tell
+          you a meeting is about to start with its window shut. A browser tab is the first
+          thing you close.
         </p>
         <p class="section-lede">
           The board starts with nothing configured and tells you what is missing.
@@ -459,13 +471,16 @@
             <span>terminal</span>
           </div>
           <pre><span class="p">$</span> <span class="c">git clone</span> <span class="m">&lt;the Upwind repository&gt;</span>
-<span class="p">$</span> <span class="c">cd</span> current
+<span class="p">$</span> <span class="c">cd</span> <span class="m">&lt;the repo&gt;</span>/current
+<span class="p">$</span> <span class="c">npm run setup</span>
+
+<span class="p">#</span> <span class="m">walks every step, GitHub included, and is safe to re-run</span>
+<span class="p">$</span> <span class="c">open</span> ~/Applications/current.app
+
+<span class="p">#</span> <span class="m">or keep it in a tab instead</span>
 <span class="p">$</span> <span class="c">npm start</span>
 
-  current → http://localhost:4319
-
-<span class="p">#</span> <span class="m">GitHub borrows your existing CLI session</span>
-<span class="p">$</span> <span class="c">gh auth login</span></pre>
+  current → http://localhost:4319</pre>
         </div>
 
         <div class="cards">
