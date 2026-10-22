@@ -220,9 +220,26 @@
               as a quiet one.
             </p>
             <p>
-              The schema, and a prompt that fills the file through an assistant, are in
-              the repository's own <code>docs/jira-snapshot.md</code>.
+              Three steps, and only the third involves the repository.
             </p>
+            <ol>
+              <li>
+                <b>Enable the connector.</b> In your assistant's settings, enable its
+                Atlassian connector and sign in with your work Atlassian account. The
+                consent screen has to grant read access to Jira. If yours says to ask an
+                administrator, that is the only gate on this route.
+              </li>
+              <li>
+                <b>Open the assistant on the repository folder.</b> The connector is an
+                OAuth session belonging to the assistant and no Node process can borrow
+                it, so the handoff is a file on disk. A chat with no access to the folder
+                cannot write it.
+              </li>
+              <li>
+                <b>Paste the prompt</b> from <code>docs/jira-snapshot.md</code>, which also
+                carries the schema, then reload the board.
+              </li>
+            </ol>
             <h4>Keeping it fresh</h4>
             <p>
               Refreshing it by hand gets dull, so ask your assistant for a scheduled task
