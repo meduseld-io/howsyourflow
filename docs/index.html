@@ -7,7 +7,7 @@
     <title>Documentation - current</title>
     <meta
       name="description"
-      content="How to install, connect and run current: the GitHub and Jira routes, the calendar and Slack sources, every signal the board raises, the full configuration reference and what stays on your machine."
+      content="How to install, connect and run current: the GitHub and Jira routes, the calendar source, every signal the board raises, the full configuration reference and what stays on your machine."
     />
     <link rel="icon" type="image/png" href="/favicon.png" />
 
@@ -75,7 +75,6 @@
               <a href="#github">Connecting GitHub</a>
               <a href="#jira">Connecting Jira</a>
               <a href="#calendar">Calendar</a>
-              <a href="#slack">Slack</a>
 
               <p class="group">Using the board</p>
               <a href="#board">What the board shows</a>
@@ -295,32 +294,6 @@
               meetings are almost all one or the other, and a full RRULE implementation buys
               very little for a working day. Meetings you declined, and meetings where
               everyone else declined, are left out.
-            </p>
-          </section>
-
-          <section id="slack">
-            <h2><a class="anchor" href="#slack" aria-hidden="true">#</a>Slack</h2>
-            <p>
-              If you ask for reviews in Slack, a pull request row can show
-              <strong>asked 2 days ago</strong>, linking to the message. The useful half is
-              the absence: a pull request waiting on review with no such chip is one nobody
-              has actually been asked to look at.
-            </p>
-            <p>
-              There is no live Slack path. Finding your own messages needs
-              <code>search.messages</code>, which Slack accepts only from a user token, and
-              user tokens require a Slack app your workspace may not let you create. So this
-              reads <code>data/slack-snapshot.json</code>, written by anything that can
-              search Slack on your behalf. The shape is documented in
-              <code>lib/slack.js</code>.
-            </p>
-            <p>
-              That suits the problem. Deciding whether a message is a review request is a
-              judgement rather than a pattern match: people post pull request links to ask
-              an unrelated question, to share a branch, or to point at a
-              <code>/tree/</code> URL that is not a pull request at all. Whatever writes the
-              snapshot should read for intent and leave out anything doubtful. A missing
-              chip is invisible, a wrong one is a lie.
             </p>
           </section>
 
@@ -707,7 +680,6 @@
                 <tr><td><code>lib/jira.js</code></td><td>Jira REST v3, with a snapshot-file fallback</td></tr>
                 <tr><td><code>lib/focus.js</code></td><td>The ranking rules and the ticket/PR linking</td></tr>
                 <tr><td><code>lib/calendar.js</code></td><td>iCalendar parsing, free-time arithmetic</td></tr>
-                <tr><td><code>lib/slack.js</code></td><td>Review requests read from a snapshot</td></tr>
                 <tr><td><code>lib/status.js</code></td><td>Public status pages</td></tr>
                 <tr><td><code>lib/setup.js</code></td><td>The connection checks behind the setup panel</td></tr>
                 <tr><td><code>lib/facts.js</code></td><td>Wikipedia "On this day", for the loading strip</td></tr>

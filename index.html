@@ -155,7 +155,7 @@
                 <span data-tip="Approved and green, waiting only for someone to press merge."><b class="n-ready">1</b> ready</span>
                 <span data-tip="Pull requests where someone else is blocked until you review."><b class="n-review">3</b> to review</span>
               </span>
-              <span class="pbar-dots" data-tip="GitHub, Jira, Slack and Claude. A degraded one makes this board look broken through no fault of its own, so it says so.">
+              <span class="pbar-dots" data-tip="GitHub, Jira, Rovo, Claude and Slack. A degraded one makes this board look broken through no fault of its own, so it says so.">
                 <i class="pdot"></i><i class="pdot"></i><i class="pdot"></i><i class="pdot warn"></i>
               </span>
             </span>
@@ -412,18 +412,6 @@
             </ol>
           </div>
 
-          <div class="card">
-            <h3>Slack</h3>
-            <p class="card-note">Whether you have asked for a review yet.</p>
-            <ol class="routes">
-              <li>
-                <span class="tag">Snapshot</span>
-                <code>data/slack-snapshot.json</code>. Searching your own messages needs a
-                user token, which most workspaces will not issue, so this one is a file by
-                design. See <code>lib/slack.js</code>.
-              </li>
-            </ol>
-          </div>
         </div>
 
         <p class="preview-note">
