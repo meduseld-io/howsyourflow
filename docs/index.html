@@ -205,120 +205,42 @@
           <section id="jira">
             <h2><a class="anchor" href="#jira" aria-hidden="true">#</a>Connecting Jira</h2>
             <p>
-              Two routes. Both produce the same board through the same shaping code, so
-              nothing on screen depends on which door opened.
+              One command, the same bargain as GitHub. The session is yours, so the board
+              shows your tickets and nothing is stored in a file.
             </p>
-
-            <h3><a class="anchor" href="#jira" aria-hidden="true">#</a>1. A snapshot file</h3>
+            <div class="cmd">
+              <button class="copy" type="button">copy</button>
+              <pre><span class="p">$</span> <span class="c">acli jira auth login</span> --web</pre>
+            </div>
             <p>
-              The route to start on, because it asks nothing of anybody. The board reads
-              <code>data/jira-snapshot.json</code>, so it can be fed by anything that
-              <em>can</em> reach Jira: a script, a scheduled job, or an assistant with a
-              Jira integration, such as Claude through the Atlassian connector,
-              running the queries on your behalf. The board reads it like
-              any other source and says how old it is, so a stale day is never passed off
-              as a quiet one.
-            </p>
-            <p>
-              Three steps, and only the third involves the repository.
-            </p>
-            <ol>
-              <li>
-                <b>Enable the connector.</b> In your assistant's settings, enable its
-                Atlassian connector and sign in with your work Atlassian account. The
-                consent screen has to grant read access to Jira. If yours says to ask an
-                administrator, that is the only gate on this route.
-              </li>
-              <li>
-                <b>Open the assistant on the repository folder.</b> The connector is an
-                OAuth session belonging to the assistant and no Node process can borrow
-                it, so the handoff is a file on disk. A chat with no access to the folder
-                cannot write it.
-              </li>
-              <li>
-                <b>Paste the prompt</b> from <code>docs/jira-snapshot.md</code>, which also
-                carries the schema, then reload the board.
-              </li>
-            </ol>
-            <h4>Keeping it fresh</h4>
-            <p>
-              Refreshing it by hand gets dull, so ask your assistant for a scheduled task
-              that reruns the prompt every half hour. The board shows each snapshot's age,
-              so you can see at a glance whether the schedule is really running.
+              That opens a browser once. Afterwards <code>acli jira auth status</code>
+              answers for the board, exactly as <code>gh auth status</code> does for GitHub.
             </p>
             <div class="note">
               <p>
-                <b>Write the file directly, not through the shell.</b> A scheduled run has
-                nobody present to approve a command whose text changes every time, so a
-                task that builds its JSON with <code>node -e</code>, a heredoc or
-                <code>jq</code> stops and waits for a permission that never comes. From the
-                outside that is indistinguishable from the task never having run. Keep the
-                shell to one fixed command, <code>node scripts/check-snapshots.mjs</code>,
-                which validates the files and can be allowed once.
+                <b>No <code>JIRA_ASSIGNEE</code>, and no token variables.</b> A provisioned
+                token belongs to whoever created it, so <code>currentUser()</code> meant
+                them rather than you, and the board would authenticate perfectly and report
+                that you had no tickets. Signed in as yourself that cannot happen, and the
+                setting that used to work around it is gone.
               </p>
             </div>
-            <div class="note">
-              <p>
-                <b>Point the task at the checkout the board runs from.</b> With more than
-                one clone, a task will refresh the one nobody is looking at, every half
-                hour, successfully, and nothing reports an error. A snapshot age in
-                <strong>Check setup</strong> that is older than the schedule means the task
-                is writing somewhere else.
-              </p>
-            </div>
-            <div class="note warn">
-              <p>
-                <b>On failure, leave the old file alone.</b> A stale snapshot is labelled
-                as stale. An empty one reads as "no tickets", which is a worse lie than
-                being out of date.
-              </p>
-            </div>
-
-            <h3><a class="anchor" href="#jira" aria-hidden="true">#</a>2. An API token</h3>
+            <h3><a class="anchor" href="#jira" aria-hidden="true">#</a>Why it fills in twice</h3>
             <p>
-              Set <code>JIRA_BASE_URL</code>, <code>JIRA_EMAIL</code> and
-              <a href="https://id.atlassian.com/manage-profile/security/api-tokens"><code>JIRA_API_TOKEN</code></a>
-              in <code>.env</code>. All three or none.
+              Worth knowing, because you will see it. <code>acli jira workitem search</code>
+              returns eight fields and <code>updated</code>, <code>duedate</code>,
+              <code>parent</code>, <code>resolutiondate</code> and <code>comment</code> are
+              not among them. There is no room for them in its response type, so no flag
+              reaches them and <code>*all</code> is refused as well. Those come from
+              <code>acli jira workitem view</code>, one ticket per call.
             </p>
-            <div class="note warn">
-              <p>
-                <b>Your organisation may have switched off self-service tokens.</b> The
-                plain <em>Create API token</em> button is greyed out with "An admin blocked
-                your tokens", and <em>Create API token with scopes</em> leads to an app
-                picker that may not offer Jira at all. That is a policy rather than a wall:
-                an administrator can usually provision a token on request, so it is worth
-                doing if you would rather not keep a snapshot up to date.
-              </p>
-            </div>
-            <div class="note warn">
-              <p>
-                <b>Scoped tokens</b> must go through Atlassian's gateway rather than your
-                site URL, so they also need <code>JIRA_CLOUD_ID</code>. An unscoped token
-                does not.
-              </p>
-            </div>
-            <div class="note">
-              <p>
-                <b>A token belongs to the account that created it.</b> Basic auth sends the
-                email and the token as a matched pair, so an administrator's token paired
-                with your own address fails, and it fails silently: Jira answers
-                <code>401</code> exactly as it answers a request carrying no credentials at
-                all. Pair a token with its owner's email, then set
-                <code>JIRA_ASSIGNEE</code> to the person the board is actually about.
-              </p>
-            </div>
-            <div class="note">
-              <p>
-                <b>A shared or admin token reports zero tickets.</b> Jira's
-                <code>currentUser()</code> is whoever owns the token, so an administrative
-                account authenticates perfectly and then owns none of your work, which
-                looks exactly like an empty board. <code>JIRA_ASSIGNEE</code> names the
-                person instead, and the header will say who that is rather than who holds
-                the credentials.
-              </p>
-            </div>
-
-            <p>Leave all of it unset to run GitHub-only.</p>
+            <p>
+              So the board draws itself from the search straight away and fills the detail
+              in behind, six at a time, cached for ten minutes. A cold start shows the whole
+              list at once, and timestamps, epic grouping and comments arrive a few seconds
+              later rather than holding the page up.
+            </p>
+            <p>Not signed in, and Jira is simply absent. The board runs GitHub-only.</p>
           </section>
           <section id="calendar">
             <h2><a class="anchor" href="#calendar" aria-hidden="true">#</a>Calendar</h2>
@@ -692,9 +614,6 @@
             <table>
               <thead><tr><th style="width: 38%">Variable</th><th>Effect</th></tr></thead>
               <tbody>
-                <tr><td><code>JIRA_ASSIGNEE</code></td><td>Whose board this is. Needed when the credential belongs to someone else</td></tr>
-                <tr><td><code>JIRA_BASE_URL</code><br /><code>JIRA_EMAIL</code><br /><code>JIRA_API_TOKEN</code></td><td>Connects Jira directly, instead of through a snapshot. All three or none</td></tr>
-                <tr><td><code>JIRA_CLOUD_ID</code></td><td>Only for <em>scoped</em> tokens, which must use Atlassian's gateway</td></tr>
                 <tr><td><code>JIRA_JQL</code></td><td>Which tickets count as yours</td></tr>
                 <tr><td><code>JIRA_PARKED_STATUSES</code></td><td>Statuses meaning "deliberately parked", such as On-Hold</td></tr>
                 <tr><td><code>JIRA_REVIEW_STATUSES</code></td><td>Statuses meaning "in review". Without one of these the out-of-sync rule cannot fire</td></tr>
@@ -751,8 +670,12 @@
               <thead><tr><th style="width: 40%">Symptom</th><th>Usually</th></tr></thead>
               <tbody>
                 <tr>
-                  <td>Jira authenticates but shows no tickets</td>
-                  <td>The credential belongs to a shared or admin account that owns none of your work. Set <code>JIRA_ASSIGNEE</code></td>
+                  <td>Jira is missing entirely</td>
+                  <td>Not signed in. <code>acli jira auth login --web</code>, then reload</td>
+                </tr>
+                <tr>
+                  <td>Tickets appear, but with no times, epics or comments</td>
+                  <td>Normal for a second or two. Those come from a per-ticket pass that runs behind the first paint. If they never arrive, check <code>acli jira auth status</code></td>
                 </tr>
                 <tr>
                   <td>Tickets with open PRs never flag as out of sync</td>
@@ -769,10 +692,6 @@
                 <tr>
                   <td>The calendar strip claims a free day</td>
                   <td>The snapshot is stale. It refreshes in the background at most every half hour, and says so rather than guessing</td>
-                </tr>
-                <tr>
-                  <td>A scoped Jira token 401s</td>
-                  <td>Scoped tokens need <code>JIRA_CLOUD_ID</code> and Atlassian's gateway</td>
                 </tr>
               </tbody>
             </table>

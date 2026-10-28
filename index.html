@@ -354,9 +354,9 @@
         <p class="eyebrow">Setup</p>
         <h2>Every source has more than one door</h2>
         <p class="section-lede">
-          Nothing here assumes a CLI is already installed or that your organisation will
-          hand you an API token. Each source lists the route that asks the least of you
-          first. Set two and the explicit one in <code>.env</code> wins.
+          GitHub and Jira both sign in through their own CLI, so neither needs a token in
+          a file. Where a source has more than one route, the one that asks the least of
+          you is listed first, and an explicit setting in <code>.env</code> wins.
         </p>
         <p class="section-lede">
           Settings holds a
@@ -387,20 +387,10 @@
             <p class="card-note">Tickets, standup summary, ticket and PR linking.</p>
             <ol class="routes">
               <li>
-                <span class="tag best">Connector</span>
-                <code>data/jira-snapshot.json</code>, written by Claude through the Atlassian
-                connector. Nothing to request and nobody to ask, which is why it is the
-                route to start on.
-              </li>
-              <li>
-                <span class="tag">Token</span>
-                <code>JIRA_BASE_URL</code>, <code>JIRA_EMAIL</code> and
-                <code>JIRA_API_TOKEN</code> in <code>.env</code>, which wins over the
-                snapshot once set. Where self-service tokens are switched off an
-                administrator can usually provision one. Pair it with the email of whoever
-                owns it, set <code>JIRA_ASSIGNEE</code> when that is not you, or the board
-                authenticates perfectly and reports no tickets, and add
-                <code>JIRA_CLOUD_ID</code> if the token is a scoped one.
+                <span class="tag best">CLI</span>
+                <code>acli jira auth login --web</code>. Nothing to store, nothing in a
+                file, and the session is yours, so the board shows your tickets rather than
+                those of whoever provisioned a token.
               </li>
             </ol>
           </div>
