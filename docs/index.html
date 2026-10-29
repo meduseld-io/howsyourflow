@@ -264,12 +264,9 @@
             </p>
 
             <h3><a class="anchor" href="#calendar" aria-hidden="true">#</a>From macOS Calendar</h3>
-            <div class="cmd">
-              <button class="copy" type="button">copy</button>
-              <pre><span class="p">$</span> <span class="c">node</span> scripts/sync-calendar.mjs</pre>
-            </div>
             <p>
-              This asks Calendar.app for today's meetings and writes the snapshot. It needs
+              Nothing to configure. The setup walkthrough offers it, and from then on the
+              board asks Calendar.app for today's meetings itself. It needs
               no OAuth client, no app registration and no administrator, only the one-time
               automation prompt macOS shows on first run. It deduplicates, so a meeting held
               in both a work calendar and a subscribed copy appears once.
@@ -315,10 +312,9 @@
               </p>
             </div>
             <p>
-              Failing both, <code>data/calendar-snapshot.json</code> is read instead, holding
-              either raw events or an already-summarised day;
-              <code>lib/calendar.js</code> documents both shapes. With none of the three, the
-              strip simply does not appear.
+              Failing both, a snapshot file is read instead, holding either raw events or
+              an already-summarised day. With none of the three, the strip simply does not
+              appear.
             </p>
             <p>
               Only daily and weekly recurrence is expanded. Standups, one-to-ones and team
@@ -553,10 +549,9 @@
             <h3><a class="anchor" href="#extras" aria-hidden="true">#</a>The guided tour</h3>
             <p>
               The <strong>?</strong> button in the header runs a guided tour: it freezes the
-              page, spotlights each section in turn and explains what it is for. The steps
-              are declared at the top of <code>public/tour.js</code>, anchored to
-              <code>data-tour</code> attributes, and any step whose target is not on the page
-              is skipped. Most sections remove themselves when empty, and stopping on a blank
+              page, spotlights each section in turn and explains what it is for. Each step
+              is anchored to a section rather than a position, and any step whose target is
+              not on the page is skipped. Most sections remove themselves when empty, and stopping on a blank
               rectangle would be worse than moving on.
             </p>
 
@@ -565,10 +560,9 @@
               While the board loads, the strip under the header shows an entry from
               Wikipedia's "on this day". Those picks lean heavily on wars, disasters and
               killings, because that is what tends to be historically notable, which is a
-              poor fit for something glanced at during standup.
-              <code>lib/facts.js</code> filters that subject matter out and tops the pool
-              back up from the longer events feed for the same day when filtering leaves too
-              little. The matching errs towards discarding: there are far more entries per
+              poor fit for something glanced at during standup. That subject
+              matter is filtered out, and the pool topped back up from the longer events
+              feed for the same day when filtering leaves too little. The matching errs towards discarding: there are far more entries per
               day than the buffer needs, so a false positive costs nothing.
             </p>
 
@@ -845,38 +839,30 @@
 
           <section id="architecture">
             <h2><a class="anchor" href="#architecture" aria-hidden="true">#</a>How it is built</h2>
-            <table>
-              <thead><tr><th style="width: 38%">File</th><th>What it does</th></tr></thead>
-              <tbody>
-                <tr><td><code>server.js</code></td><td>HTTP server, static files and the JSON API</td></tr>
-                <tr><td><code>lib/github.js</code></td><td>GraphQL for pull requests, REST for notifications and merging</td></tr>
-                <tr><td><code>lib/jira.js</code></td><td>Jira through the Atlassian CLI, with a snapshot-file fallback</td></tr>
-                <tr><td><code>lib/acli.js</code></td><td>The CLI itself: searching, the detail pass, and signing in from the board</td></tr>
-                <tr><td><code>lib/team.js</code></td><td>The roster, and the three questions the team view answers</td></tr>
-                <tr><td><code>lib/focus.js</code></td><td>The ranking rules and the ticket/PR linking</td></tr>
-                <tr><td><code>lib/calendar.js</code></td><td>iCalendar parsing, free-time arithmetic</td></tr>
-                <tr><td><code>lib/status.js</code></td><td>Public status pages</td></tr>
-                <tr><td><code>lib/setup.js</code></td><td>The connection checks behind the setup panel</td></tr>
-                <tr><td><code>lib/facts.js</code></td><td>Wikipedia "On this day", for the loading strip</td></tr>
-                <tr><td><code>lib/version.js</code></td><td>What is running against what is installed, and whether it can restart itself</td></tr>
-                <tr><td><code>public/</code></td><td>The single-page front end</td></tr>
-                <tr><td><code>scripts/sync-calendar.mjs</code></td><td>Writes today's meetings from macOS Calendar</td></tr>
-                <tr><td><code>scripts/install-agent.sh</code></td><td>Writes and loads the launch agent, so the board is up before anybody looks for it</td></tr>
-                <tr><td><code>test/</code></td><td><code>node --test</code>, no framework</td></tr>
-              </tbody>
-            </table>
+            <p>
+              A small Node HTTP server and a single-page front end, with no dependencies, no
+              build step and no framework. It serves its own static files and a JSON API,
+              and the page is plain modules the browser loads directly, so what runs is what
+              was written.
+            </p>
+            <p>
+              Everything is read live from the tools you are already signed in to. There is
+              no database and no state on the server beyond a short cache: GitHub through
+              its GraphQL and REST APIs, Jira through the Atlassian CLI, the calendar from
+              macOS or an iCal address. Your own choices, such as pins, notes and which
+              signals you want, live in your browser rather than anywhere central.
+            </p>
             <p>
               Data refreshes on load, on <strong>Refresh</strong> and every five minutes.
-              Responses are cached for 60 seconds.
+              Responses are cached for 60 seconds, and the team view for two minutes.
+            </p>
+            <p>
+              The tests run with Node's own test runner, no framework:
             </p>
             <div class="cmd">
               <button class="copy" type="button">copy</button>
               <pre><span class="p">$</span> <span class="c">npm test</span></pre>
             </div>
-            <p>
-              <code>lib/focus.js</code> holds the ranking rules and is the part most worth
-              covering.
-            </p>
           </section>
 
           <section id="licence">
