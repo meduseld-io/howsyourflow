@@ -86,6 +86,7 @@
               <a href="#notifications">Desktop notifications</a>
               <a href="#extras">Search, the tour and the game</a>
               <a href="#status-dots">Service status dots</a>
+              <a href="#team">The team view</a>
 
               <p class="group">Reference</p>
               <a href="#config">Configuration</a>
@@ -239,7 +240,19 @@
               list at once, and timestamps, epic grouping and comments arrive a few seconds
               later rather than holding the page up.
             </p>
-            <p>Not signed in, and Jira is simply absent. The board runs GitHub-only.</p>
+            <h3><a class="anchor" href="#jira" aria-hidden="true">#</a>When the session expires</h3>
+            <p>
+              It will. <code>acli</code> sessions run out, usually overnight, and a board
+              that was right yesterday opens today with Jira answering nothing. That used
+              to look exactly like a day with no tickets on it, which is the one reading
+              that is both plausible and wrong.
+            </p>
+            <p>
+              So a signed-out Jira says so, and offers a <strong>Sign in</strong> button in
+              the banner and in the Setup panel. It opens the same browser tab the command
+              does and takes about as long as approving it. Not signed in and not signing
+              in, Jira is simply absent and the board runs GitHub-only.
+            </p>
           </section>
           <section id="calendar">
             <h2><a class="anchor" href="#calendar" aria-hidden="true">#</a>Calendar</h2>
@@ -262,10 +275,28 @@
               in both a work calendar and a subscribed copy appears once.
             </p>
             <p>
-              You should not have to run it. A snapshot only describes the day it was taken,
-              and a step you must remember every morning is a step that does not happen, so
-              a stale snapshot is refreshed in the background at most every half hour.
+              You should not have to run it. A snapshot only describes the moment it was
+              taken, and a step you must remember every morning is a step that does not
+              happen, so one older than ten minutes is refreshed in the background.
               <code>CALENDAR_AUTOSYNC=off</code> turns that off.
+            </p>
+
+            <h3><a class="anchor" href="#calendar" aria-hidden="true">#</a>Meetings that move or vanish</h3>
+            <p>
+              Each sync is compared against the one before it. A meeting whose title is
+              still in the day at a different time is marked where it now sits rather than
+              listed twice. One that has gone from the calendar entirely is put back in its
+              old slot, greyed, saying it was taken out, because a meeting silently
+              disappearing from your morning is the change you are most likely to miss.
+              Neither is counted in the day's totals: a cancelled hour is free.
+            </p>
+            <p>
+              Both are matched on the title, which is the only stable thing a snapshot
+              carries. That makes the match ambiguous the moment a title appears twice, and
+              recurring one-to-ones genuinely do appear several times in a day, so a title
+              that is not unique on both sides is left alone and only the disappearance is
+              reported. A move is claimed only where there is exactly one candidate it
+              could be.
             </p>
 
             <h3><a class="anchor" href="#calendar" aria-hidden="true">#</a>From an iCal address</h3>
@@ -335,23 +366,35 @@
               These rules decide what is worth raising. They are grouped here by colour, in
               the same severity order the board itself ranks them in.
             </p>
+            <p>
+              Any of them can be switched off under <strong>Signals</strong> in settings,
+              with a count beside each one of how much it is raising today. Switching one
+              off takes away a reason rather than a card: a pull request that is both red
+              and waiting on review still wants reviewing once CI failing is off, so the
+              next reason takes over and the rest fall in behind it. Only work with nothing
+              left to say about it goes.
+            </p>
             <table>
               <thead>
                 <tr><th style="width: 32px"></th><th style="width: 32%">Signal</th><th>Why it surfaces</th></tr>
               </thead>
               <tbody>
+                <tr><td><span class="sig-dot"></span></td><td>Anything still in draft</td><td>Not a rule but a property of the work. Switching it off takes the card whole, whatever else is wrong with it, for people who would rather not see a branch until it is marked ready</td></tr>
                 <tr><td><span class="sig-dot blocked"></span></td><td>Changes requested</td><td>A reviewer is blocking, and it names who</td></tr>
                 <tr><td><span class="sig-dot blocked"></span></td><td>CI failing</td><td>Checks are red on the latest commit</td></tr>
                 <tr><td><span class="sig-dot blocked"></span></td><td>Merge conflicts</td><td>Cannot land until rebased</td></tr>
                 <tr><td><span class="sig-dot ready"></span></td><td>Ready to merge</td><td>Approved and green, so the label is also the merge button</td></tr>
+                <tr><td><span class="sig-dot waiting"></span></td><td>Comments to answer</td><td>Somebody has commented and is waiting on you, which is your move rather than theirs</td></tr>
                 <tr><td><span class="sig-dot review"></span></td><td>Review asked of you</td><td>Requested by name, not via a team</td></tr>
+                <tr><td><span class="sig-dot review"></span></td><td>Review requested (team queue)</td><td>Routed through a team you are in. A shared queue rather than a personal debt, which is why it is a separate signal you can switch off on its own</td></tr>
                 <tr><td><span class="sig-dot review"></span></td><td>Waiting on review</td><td>Open 2+ days with no approval</td></tr>
                 <tr><td><span class="sig-dot waiting"></span></td><td>Closed but not shipped</td><td>The ticket is marked done but its PR is still open</td></tr>
-                <tr><td><span class="sig-dot waiting"></span></td><td>Overdue / due soon</td><td>Due date passed or within three days</td></tr>
+                <tr><td><span class="sig-dot waiting"></span></td><td>Due soon or overdue</td><td>Due date passed or within three days</td></tr>
                 <tr><td><span class="sig-dot waiting"></span></td><td>Ticket needs moving</td><td>Every linked PR merged but the ticket is still open</td></tr>
                 <tr><td><span class="sig-dot waiting"></span></td><td>Ticket out of sync</td><td>The PR is up for review but the ticket is still in To Do</td></tr>
                 <tr><td><span class="sig-dot"></span></td><td>In progress, no PR</td><td>Ticket in flight, quiet 5+ days, nothing pushed</td></tr>
                 <tr><td><span class="sig-dot"></span></td><td>Stale draft</td><td>Draft untouched for a week</td></tr>
+                <tr><td><span class="sig-dot"></span></td><td>Parked</td><td>A ticket in a status you have called parked. Ranked last on purpose: it is the one severity describing something you cannot act on today, so it never sits above work you can</td></tr>
               </tbody>
             </table>
           </section>
@@ -567,6 +610,111 @@
             </p>
           </section>
 
+          <section id="team">
+            <h2><a class="anchor" href="#team" aria-hidden="true">#</a>The team view</h2>
+            <p>
+              The board answers "what should I pick up". There are three questions it
+              cannot answer by looking at any one person: who is stuck, who is carrying how
+              much, and which of the team's own pull requests are sitting unreviewed. Those
+              are a different view, and a toggle at the bottom of settings swaps to it.
+            </p>
+            <p>
+              It is off until a team exists. Set <code>TEAM</code> in <code>.env</code>, one
+              entry per person, pairing their Jira address with their GitHub handle:
+            </p>
+            <div class="cmd">
+              <button class="copy" type="button">copy</button>
+              <pre>TEAM=ada@example.com:ada-l, grace@example.com:ghopper:Grace H</pre>
+            </div>
+            <p>
+              The mapping has to be written down because nothing either side returns
+              connects the two: Jira knows people by work email and GitHub by handle. A
+              third field names anyone whose display name is not their address, though it
+              is rarely needed, since Jira's own spelling of a name wins over the one read
+              out of an email. Without a <code>TEAM</code> the toggle does not appear at
+              all.
+            </p>
+            <p>
+              A handle GitHub has never heard of is called out in red rather than left to
+              look like somebody with no pull requests. A typo returns nothing, which on
+              screen is indistinguishable from a quiet week, and one of those is a fact
+              about a person while the other is a fact about a config line.
+            </p>
+
+            <h3><a class="anchor" href="#team" aria-hidden="true">#</a>Where people are stuck</h3>
+            <p>
+              A block per person, led by what is in their way, sorted by how much is stuck
+              rather than alphabetically or by volume. The name at the top is the one to ask
+              about. The cards are the board's own, with the same colours and chips, minus
+              the pin, note and snooze, which are statements about work you are going to do
+              yourself. Signals you have switched off apply here too.
+            </p>
+
+            <h3><a class="anchor" href="#team" aria-hidden="true">#</a>Waiting on review</h3>
+            <p>
+              The team's own pull requests that nobody has got to, oldest first. Built from
+              what the team wrote rather than what it has been asked to review: a review the
+              team owes somebody else is their problem, a review the team is owed is work of
+              theirs that is not moving. Approved and draft ones are left out, since an
+              approved pull request is waiting on its author.
+            </p>
+            <p>
+              Who it is waiting on reads as whoever was asked, teams included, since routing
+              a review to a group is a real answer. Where nobody is pending there are two
+              opposite situations and the row says which: <em>nobody asked</em> means no
+              reviewer was ever requested, while <em>reviewed, nobody waiting</em> means
+              somebody was asked, answered, and it is back with the author. GitHub drops a
+              request the moment that person submits a review, so these look identical in
+              the data and only one of them wants a reviewer found.
+            </p>
+            <p>
+              Colour runs opposite to the board here, on purpose. A card goes grey in Your
+              work once it is stale, because the board has decided you cannot act on it. A
+              review that has waited five months is the reverse: the longer it sits, the
+              more it is somebody's job to unstick it. Over three weeks is red, over one is
+              amber.
+            </p>
+
+            <h3><a class="anchor" href="#team" aria-hidden="true">#</a>Tickets you raised</h3>
+            <p>
+              Where the things you asked for ended up. Jira has no assigner: nothing records
+              who handed a ticket to somebody, and the assignee field keeps no history of
+              how it got its value, so this goes on reporter, which for work given out is
+              usually the same person.
+            </p>
+            <p>
+              Not filtered to other people's names, deliberately. A ticket you raised and
+              never gave anybody is the one most likely to have been forgotten, precisely
+              because it is your own doing and nothing else on the board mentions it. Those
+              come first, in red. Then whoever holds it, then your own last, since they are
+              already on your board under My tickets and would otherwise bury the rest.
+            </p>
+
+            <h3><a class="anchor" href="#team" aria-hidden="true">#</a>What it costs</h3>
+            <p>
+              About what one person costs. Jira takes an <code>assignee in (...)</code>
+              clause and GitHub ORs repeated <code>author:</code> terms in one search, so
+              the queries do not multiply by the size of the team. It is fetched on the
+              first switch and cached, so a board nobody switches pays nothing.
+            </p>
+            <p>
+              What does not scale is the answer. Both queries take a maximum and both order
+              by recency, so a team large enough to exceed one would lose whoever has been
+              quiet longest, which on screen is a person reported as having nothing on. A
+              result that comes back exactly full is reported as incomplete instead.
+            </p>
+            <div class="note">
+              <p>
+                <b>Other people's tickets raise fewer signals than your own.</b> The search
+                cannot return <code>updated</code>, as described under
+                <a href="#jira">Connecting Jira</a>, and the detail pass that would fill it
+                in costs about a second per ticket. So the age-based rules stay quiet for
+                team members rather than reporting a wrong number. Everything that comes
+                from GitHub is unaffected, which is where most of being stuck lives.
+              </p>
+            </div>
+          </section>
+
           <section id="config">
             <h2><a class="anchor" href="#config" aria-hidden="true">#</a>Configuration</h2>
             <p>
@@ -600,6 +748,15 @@
                 <tr><td><code>CALENDAR_AUTOSYNC</code></td><td><code>off</code> stops the background macOS Calendar refresh</td></tr>
                 <tr><td><code>CALENDAR_ICS_URL</code></td><td>A calendar's private iCal address</td></tr>
                 <tr><td><code>CALENDAR_NO_WAIT</code></td><td>Skips the brief pause the sync script leaves after opening Calendar.app. Useful when scripting it somewhere Calendar is already running</td></tr>
+              </tbody>
+            </table>
+
+            <h3><a class="anchor" href="#config" aria-hidden="true">#</a>Team</h3>
+            <table>
+              <thead><tr><th style="width: 38%">Variable</th><th>Effect</th></tr></thead>
+              <tbody>
+                <tr><td><code>TEAM</code></td><td>Who is on your team, as <code>jira-email:github-handle</code> pairs separated by commas, with an optional third field for a display name. Unset, the team view does not appear</td></tr>
+                <tr><td><code>TEAM_ORG</code></td><td>Which GitHub organisation the team's pull requests are looked for in. Without it the search reaches into personal repositories</td></tr>
               </tbody>
             </table>
 
@@ -644,7 +801,11 @@
               <tbody>
                 <tr>
                   <td>Jira is missing entirely</td>
-                  <td>Not signed in. <code>acli jira auth login --web</code>, then reload</td>
+                  <td>Not signed in. The banner says so and offers a <strong>Sign in</strong> button; <code>acli jira auth login --web</code> does the same from a terminal</td>
+                </tr>
+                <tr>
+                  <td>Signing in opened a browser, you approved, and nothing happened</td>
+                  <td>Fixed in 1.4.1. <code>acli</code> draws a terminal picker after the callback lands and waits for Enter, which nothing could press. Older copies sit there until they time out. Update, or finish that one in a terminal</td>
                 </tr>
                 <tr>
                   <td>Tickets appear, but with no times, epics or comments</td>
@@ -663,8 +824,20 @@
                   <td>The token is not being found. Check <code>gh auth status</code>, and remember a launcher with a minimal <code>PATH</code> may not find <code>gh</code> at all</td>
                 </tr>
                 <tr>
+                  <td>The calendar shows a meeting that was cancelled or moved</td>
+                  <td>The snapshot is older than the change. It refreshes in the background every ten minutes, and the sync after the change marks the meeting rather than quietly dropping it</td>
+                </tr>
+                <tr>
                   <td>The calendar strip claims a free day</td>
-                  <td>The snapshot is stale. It refreshes in the background at most every half hour, and says so rather than guessing</td>
+                  <td>The snapshot is from another day. It says it is out of date rather than guessing, and asks for a fresh one</td>
+                </tr>
+                <tr>
+                  <td>Edits to the code change nothing</td>
+                  <td>The server reads its modules once at boot. The banner says which version is running against which is installed, with a <strong>Restart</strong> button where something is supervising the process to bring it back</td>
+                </tr>
+                <tr>
+                  <td>Somebody on the team shows no pull requests</td>
+                  <td>Usually their GitHub handle in <code>TEAM</code>. A handle that does not exist is called out in red beside their name; one that exists but belongs to somebody else is not something this can detect</td>
                 </tr>
               </tbody>
             </table>
@@ -677,14 +850,18 @@
               <tbody>
                 <tr><td><code>server.js</code></td><td>HTTP server, static files and the JSON API</td></tr>
                 <tr><td><code>lib/github.js</code></td><td>GraphQL for pull requests, REST for notifications and merging</td></tr>
-                <tr><td><code>lib/jira.js</code></td><td>Jira REST v3, with a snapshot-file fallback</td></tr>
+                <tr><td><code>lib/jira.js</code></td><td>Jira through the Atlassian CLI, with a snapshot-file fallback</td></tr>
+                <tr><td><code>lib/acli.js</code></td><td>The CLI itself: searching, the detail pass, and signing in from the board</td></tr>
+                <tr><td><code>lib/team.js</code></td><td>The roster, and the three questions the team view answers</td></tr>
                 <tr><td><code>lib/focus.js</code></td><td>The ranking rules and the ticket/PR linking</td></tr>
                 <tr><td><code>lib/calendar.js</code></td><td>iCalendar parsing, free-time arithmetic</td></tr>
                 <tr><td><code>lib/status.js</code></td><td>Public status pages</td></tr>
                 <tr><td><code>lib/setup.js</code></td><td>The connection checks behind the setup panel</td></tr>
                 <tr><td><code>lib/facts.js</code></td><td>Wikipedia "On this day", for the loading strip</td></tr>
+                <tr><td><code>lib/version.js</code></td><td>What is running against what is installed, and whether it can restart itself</td></tr>
                 <tr><td><code>public/</code></td><td>The single-page front end</td></tr>
                 <tr><td><code>scripts/sync-calendar.mjs</code></td><td>Writes today's meetings from macOS Calendar</td></tr>
+                <tr><td><code>scripts/install-agent.sh</code></td><td>Writes and loads the launch agent, so the board is up before anybody looks for it</td></tr>
                 <tr><td><code>test/</code></td><td><code>node --test</code>, no framework</td></tr>
               </tbody>
             </table>
